@@ -133,7 +133,7 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(sample_package_node src/sample_package_node.cpp)
-add_executable(my_node src/my_node.cpp src/MyNode.cpp include/MyNode.h)
+add_executable(my_node src/my_node.cpp src/MyNode.cpp include/MyNode.h src/ObstacleAvoider.cpp include/ObstacleAvoider.h)
 
 
 ## Add cmake target dependencies of the executable
