@@ -26,31 +26,30 @@ public:
     float getAngularVel();
 
     void update(struct angleInfo angle_info, struct rangeInfo range_info, std::vector<float> ranges);
-
-private:
-    float _olaf_width = 0.5;    // in m
-    std::vector<float> _ranges;
-
-
-    struct angleInfo _angle_info;
-
-    struct rangeInfo _range_info;
-
     int getRangeArraySize() {
         return abs(_angle_info.angle_max - _angle_info.angle_min) / _angle_info.angle_increment + 1;
     }
 
     bool isDistanceInValidRange(float distance) {
-        return !(distance < _range_info.range_min || distance > _range_info.range_max);
+        return !(distance < _range_info.range_min || distance > _range_info.range_max) || (distance != distance);
     }
 
     float getAngleFromIndex(int index) {
         return _angle_info.angle_min + index * _angle_info.angle_increment;
     }
 
-    float getX(float distance, float angle) {
+    static float getX(float distance, float angle) {
         return distance * cos(angle);
     }
+
+private:
+    float _olaf_width = 0.5;    // in m
+    std::vector<float> _ranges;
+
+    struct angleInfo _angle_info;
+
+    struct rangeInfo _range_info;
+
 };
 
 #endif //PROJECT_OBSTACLEAVOIDER_H

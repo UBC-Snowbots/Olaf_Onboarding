@@ -1,7 +1,7 @@
 //
 // Created by min on 21/10/17.
 //
-#include<ObstacleAvoider.h>
+#include <ObstacleAvoider.h>
 
 float ObstacleAvoider::getAngularVel() {
     int rangeArraySize = getRangeArraySize();
@@ -10,7 +10,7 @@ float ObstacleAvoider::getAngularVel() {
     //TODO: save value of previous tuple (dist1, angle1, x1) for next iteration
     // for( int i = 0; i < rangeArraySize-1; i++ ) {
     int i = 0;
-    while( i < rangeArraySize-1 ) {
+    while( i < rangeArraySize ) {
         float dist1 = _ranges[i];
 
         // skip i if distance is not valid
@@ -42,7 +42,7 @@ float ObstacleAvoider::getAngularVel() {
             return (angle1+angle2)/2;
         }
 
-        i=j+1;
+        i++;
     }
     return 0.0;
 }

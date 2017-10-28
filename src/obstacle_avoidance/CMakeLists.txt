@@ -192,7 +192,7 @@ target_link_libraries(my_node ${catkin_LIBRARIES} ${sb_utils_LIBRARIES})
 if (CATKIN_ENABLE_TESTING)
 
     # Adding gtests to the package
-    catkin_add_gtest(my-node-test test/my-node-test.cpp src/MyNode.cpp)
+    catkin_add_gtest(my-node-test test/my-node-test.cpp src/MyNode.cpp src/ObstacleAvoider.cpp)
     target_link_libraries(my-node-test ${catkin_LIBRARIES})
 
     # Adding rostest to the package
