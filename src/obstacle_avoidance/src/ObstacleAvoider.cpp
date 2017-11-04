@@ -31,13 +31,19 @@ float ObstacleAvoider::getAngularVel() {
         //TODO: handle case when dist1 is not matched with dist2?
 
         float angle1 = getAngleFromIndex(i);
-        float x1 = getX(dist1, angle1);
+//        float x1 = getX(dist1, angle1);
+        obstacle obstacle1;
+        obstacle1.distance = dist1;
+        obstacle1.angle = angle1;
 
         float angle2 = getAngleFromIndex(j);
-        float x2 = getX(dist2, angle2);
+//        float x2 = getX(dist2, angle2);
+        obstacle obstacle2;
+        obstacle2.distance = dist2;
+        obstacle2.angle = angle2;
 
         // found opening!
-        if( abs(x2-x1) >= _olaf_width  ) {
+        if( getDistBetweenObstacles(obstacle1,obstacle2) >= _olaf_width  ) {
             // return the middle angle between two angles
             return (angle1+angle2)/2;
         }
@@ -45,6 +51,27 @@ float ObstacleAvoider::getAngularVel() {
         i++;
     }
     return 0.0;
+}
+
+float ObstacleAvoider::getDistBetweenObstacles(obstacle o1, obstacle o2) {
+    float dx = getXBetweenObstacles(o1, o2);
+    float dy = getYBetweenObstacles(o1, o2);
+
+    return sqrt(pow(dx,2)+pow(dy,2));
+}
+
+float ObstacleAvoider::getXBetweenObstacles(obstacle o1, obstacle o2) {
+    float x1 = getX(o1.distance, o1.angle);
+    float x2 = getX(o2.distance, o2.angle);
+
+    return abs(x1-x2);
+}
+
+float ObstacleAvoider::getYBetweenObstacles(obstacle o1, obstacle o2) {
+    float y1 = getY(o1.distance, o1.angle);
+    float y2 = getY(o2.distance, o2.angle);
+
+    return abs(y1-y2);
 }
 
 void ObstacleAvoider::update(struct angleInfo angle_info, struct rangeInfo range_info, std::vector<float> ranges) {

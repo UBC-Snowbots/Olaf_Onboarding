@@ -12,13 +12,12 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     // Setup NodeHandles
     ros::init(argc, argv, node_name);
     ros::NodeHandle nh;
-    ros::NodeHandle private_nh("~");
 
     // TODO: get parameters for width of robot, forward velocity, rate
-    // Obtains character from the parameter server (or launch file), sets '!' as default
-    // std::string parameter_name = "my_node/character";
-    // std::string default_character = "!";
-    // SB_getParam(nh, parameter_name, suffix, default_character);
+//     Obtains character from the parameter server (or launch file), sets '!' as default
+     std::string parameter_name = "my_node/character";
+     std::string default_character = "!";
+    SB_getParam(nh, parameter_name, suffix, default_character);
 
     // Setup Subscriber(s)
     std::string topic_to_subscribe_to = "/scan";
@@ -26,25 +25,29 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     my_subscriber = nh.subscribe(topic_to_subscribe_to, refresh_rate, &MyClass::laserScanCallBack, this);
 
     // Setup Publisher(s)
-    std::string topic_to_publish_to = "/pose";
-    uint32_t queue_size = 1000;
-    my_publisher = private_nh.advertise<geometry_msgs::Twist>(topic_to_subscribe_to, queue_size);
+    std::string topic_to_publish_to = "/cmd_vel";
+    uint32_t queue_size = 1;
+    my_publisher = nh.advertise<geometry_msgs::Twist>(topic_to_publish_to, queue_size);
+
+//    goThoughCones();
 }
 
 void MyClass::goThoughCones() {
-  ros::Rate rate(_rate);
+//  ros::Rate rate(_rate);
 
-  while(ros::ok()){
+//  while(ros::ok()){
     geometry_msgs::Twist msg;
     msg.linear.x = _forward_vel;
 
-      obstacleAvoider.update(_angle_info, _range_info, _ranges);
+    obstacleAvoider.update(_angle_info, _range_info, _ranges);
     msg.angular.z = obstacleAvoider.getAngularVel();
+    std::cout << "angular z is " << msg.angular.z << std::endl;
     my_publisher.publish(msg);
+    ROS_INFO("Published message");
 
-    rate.sleep();
-    ros::spinOnce();      //Notice this
-  }
+//      rate.sleep();
+//      ros::spinOnce();      //Notice this
+//  }
 }
 
 
@@ -59,4 +62,6 @@ void MyClass::laserScanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan) {
 
     _range_info.range_min = scan->range_min;
     _range_info.range_max = scan->range_max;
+
+    goThoughCones();
 }

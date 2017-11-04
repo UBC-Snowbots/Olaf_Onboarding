@@ -22,6 +22,11 @@ public:
         float range_max;
     };
 
+    struct obstacle {
+        float distance;
+        float angle;
+    };
+
     ObstacleAvoider(){};
     float getAngularVel();
 
@@ -41,6 +46,14 @@ public:
     static float getX(float distance, float angle) {
         return distance * cos(angle);
     }
+
+    static float getY(float distance, float angle) {
+        return distance * sin(angle);
+    }
+
+    static float getDistBetweenObstacles(obstacle o1, obstacle o2);
+    static float getXBetweenObstacles(obstacle o1, obstacle o2);
+    static float getYBetweenObstacles(obstacle o1, obstacle o2);
 
 private:
     float _olaf_width = 0.5;    // in m

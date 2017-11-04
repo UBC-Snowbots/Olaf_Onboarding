@@ -17,6 +17,7 @@
 #include <geometry_msgs/Twist.h>
 #include <math.h>
 #include <ObstacleAvoider.h>
+#include <string>
 
 #define RAD2DEG(x) ((x)*180./M_PI)
 // #define OLAF_WIDTH 0.5  // 0.5 m?
@@ -45,7 +46,7 @@ private:
     ObstacleAvoider obstacleAvoider;
 
     float _forward_vel = 0.01;  // in m/s
-    float _rate = 2;            // in s?
+    float _rate = 1;            // in s?
 
     struct ObstacleAvoider::angleInfo _angle_info;
 
