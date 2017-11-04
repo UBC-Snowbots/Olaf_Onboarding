@@ -16,6 +16,7 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     velocity_publisher = nh.advertise<geometry_msgs::Twist>(topic_to_publish_to, queue_size);
 }
 
+
 //Subscriber callback
 void MyClass::processLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan) {
     //Take required information from received message
@@ -28,46 +29,76 @@ void MyClass::processLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan) {
     laser_message.range_max = scan->range_max;
     laser_message.range_min = scan->range_min;
 
-    vel_msg = goIntoGap(laser_message); //Process ranges and return velocity
+    vel_msg = avoidObstacles(laser_message); //Process ranges and return velocity
     republishVelocity(vel_msg); //Publish velocity
 }
 
+
 //Algorithm for processing laser scan message
-geometry_msgs::Twist MyClass::goIntoGap(sensor_msgs::LaserScan laser_msg) {
+geometry_msgs::Twist MyClass::avoidObstacles(sensor_msgs::LaserScan laser_msg) {
 
     geometry_msgs::Twist vel_msg; //Initialize velocity message
     vel_msg.linear.x = 0.5; //Keep forward velocity constant
 
     //ranges[0] to ranges[numIndices] represents the distances between
-    //the min and max angle scan are not necessarily equal distances from 0 (forward)
-    //we should try tossing out extra unneeded data
+    //the min and max angle scan
     int numIndices = (laser_msg.angle_max - laser_msg.angle_min)/laser_msg.angle_increment;
 
-    float angle_of_gap;
+    //These represent the refined index range for our gap search (starting at the cone edges)
+    int startIndex = 0;
+    int endIndex = numIndices;
 
-    //this iterates through all the ranges
-    //we should find a lower and upper bound index for the "edge distance spikes"
-    //then we can find the center angle of a gap within these bounds
+    //Find startIndex
     for (int i=0; i<=numIndices; i++) {
-        float distance = laser_msg.ranges[i]; //distance in meters
-        float angle = laser_msg.angle_min + (i * laser_msg.angle_increment); //In radians
+        //If distance is within 2 meters
+        if (laser_msg.ranges[i] <= 2) {
+            startIndex = i;
+            break;
+        }
+    }
+    //Find endIndex
+    for (int i=numIndices; i>=0; i--) {
+        if (laser_msg.ranges[i] <= 2) {
+            endIndex = i;
+            break;
+        }
+    }
+    //If we can't find either edge, or if we're surrounded by edges, just go forward
+    if (startIndex == 0 && endIndex == numIndices) {
+        return vel_msg;
+    }
 
-        //if a distance is out of the max & min range we should toss it out
+    int largestGap = 0; //current largest gap measured in indices
+    int currentGap = 0;
+    int endIndexGap; //end index of largest gap
 
-        if (distance == 3.2) {
-            vel_msg.angular.z = 2; //Angular velocity
+    //Find the largest gap in the edge range
+    for (int i = startIndex; i <= endIndex; i++) {
+        if (laser_msg.ranges[i] > 2) {
+            currentGap ++;
+            if (currentGap > largestGap){
+                largestGap = currentGap;
+                endIndexGap = i;
+            }
+        }
+        else {
+            currentGap = 0;
         }
     }
 
+    //Angle of gap is the angle that points to the midpoint of the largest gap
+    float angle_of_gap = laser_msg.angle_min + ((endIndexGap - largestGap/2) * laser_msg.angle_increment);
+
     //Turn robot towards the gap
-    if (angle_of_gap>0){
+    if (angle_of_gap > 0){
         vel_msg.angular.z = -1;
     }
-    else
+    else {
         vel_msg.angular.z = 1;
-
+    }
     return vel_msg;
 }
+
 
 //Publish a velocity message
 void MyClass::republishVelocity(geometry_msgs::Twist vel_msg_to_publish) {

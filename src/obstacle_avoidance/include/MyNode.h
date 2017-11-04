@@ -16,7 +16,7 @@ public:
 private:
     void republishVelocity(geometry_msgs::Twist);
     void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan_message);
-    geometry_msgs::Twist goIntoGap(sensor_msgs::LaserScan);
+    geometry_msgs::Twist avoidObstacles(sensor_msgs::LaserScan);
 
     ros::Subscriber laser_subscriber;
     ros::Publisher velocity_publisher;
