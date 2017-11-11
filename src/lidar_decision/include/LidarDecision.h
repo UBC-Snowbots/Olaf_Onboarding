@@ -18,7 +18,7 @@ using namespace std;
 class LidarDecision {
 public:
     LidarDecision(double angular_vel_cap, double linear_vel_cap, double angular_vel_multiplier,
-                  double linear_vel_multiplier, double theta_scaling_multiplier);
+                  double linear_vel_multiplier, double theta_scaling_multiplier, double max_distance_from_goal);
 
     LidarDecision();
 
@@ -26,7 +26,7 @@ public:
                                                 geometry_msgs::Point hole);
 
     double determineTurningVel(double theta, double distance);
-    double determineMovingVel(double angular_vel);
+    double determineMovingVel(double theta, double distance);
     void initTwist(geometry_msgs::Twist &twist);
 
 private:
@@ -37,6 +37,7 @@ private:
     double linear_vel_multiplier;
     double angular_vel_multiplier;
     double theta_scaling_multiplier;
+    double max_distance_from_goal;
 };
 
 #endif //OLAF_ONBOARDING_LIDARDECISION_H

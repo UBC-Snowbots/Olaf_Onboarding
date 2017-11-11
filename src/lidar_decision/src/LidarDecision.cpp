@@ -1,21 +1,21 @@
 /*
  * Created By: Robyn Castro
- * Created On: July 16th, 2016
- * Description: A node that takes in a laser scan, and publishes
- *              a twist message.
+ * Created On: November 10th, 2017
+ * Description: Determines the twist message that aims for the hole
+ *
  */
-
 #include <LidarDecision.h>
 
 using namespace std;
 
 LidarDecision::LidarDecision(double angular_vel_cap, double linear_vel_cap, double angular_vel_multiplier,
-                             double linear_vel_multiplier, double theta_scaling_multiplier):
+                             double linear_vel_multiplier, double theta_scaling_multiplier, double max_distance_from_goal):
     angular_vel_cap(angular_vel_cap),
     linear_vel_cap(linear_vel_cap),
     angular_vel_multiplier(angular_vel_multiplier),
     linear_vel_multiplier(linear_vel_multiplier),
-    theta_scaling_multiplier(theta_scaling_multiplier)
+    theta_scaling_multiplier(theta_scaling_multiplier),
+    max_distance_from_goal(max_distance_from_goal)
 {
     // Setup origin point
     origin.x = 0;
@@ -30,34 +30,39 @@ LidarDecision::LidarDecision() {
 
 geometry_msgs::Twist LidarDecision::determineDesiredMotion(vector<vector<geometry_msgs::Point>> merged_points,
                                                            geometry_msgs::Point hole) {
-    geometry_msgs::Twist follow_hole;
-    initTwist(follow_hole);
+    geometry_msgs::Twist move_to_hole;
+    geometry_msgs::Twist avoid_cones;
+    initTwist(avoid_cones);
+    initTwist(move_to_hole);
+
+    // TODO: If merged points are too close move away from them
 
     double theta = LinearAlgebra().getAngleToPoint(hole);
     double distance = LinearAlgebra().distanceBetweenPoints(hole, origin);
 
-    double angular_vel = determineTurningVel(theta, distance);
-    follow_hole.angular.z = angular_vel;
-    follow_hole.linear.x = determineMovingVel(angular_vel);
+    move_to_hole.angular.z = determineTurningVel(theta, distance);
+    move_to_hole.linear.x = determineMovingVel(theta, distance);
 
-    return follow_hole;
+    return move_to_hole;
 }
 
 double LidarDecision::determineTurningVel(double theta, double distance) {
-    // Figure out how fast we should be turning
-    double angular_vel = (theta_scaling_multiplier * theta + distance) * angular_vel_multiplier;
+    // TODO: Make turning speed dependant on distance to the hole
+    double angular_vel = theta * theta_scaling_multiplier * angular_vel_multiplier;
 
+    // Limit angular velocity
     if (fabs(angular_vel) > angular_vel_cap)
         angular_vel = angular_vel_cap * fabs(angular_vel) / angular_vel;
 
     return angular_vel;
 }
 
-double LidarDecision::determineMovingVel(double angular_vel) {
-    if (angular_vel == 0) return linear_vel_cap;
+double LidarDecision::determineMovingVel(double theta, double distance) {
+    if (distance < max_distance_from_goal) return 0;
 
-    double linear_vel = 1 / fabs(angular_vel);
+    double linear_vel = (distance * linear_vel_multiplier) / (theta * theta_scaling_multiplier);
 
+    // Limit linear velocity
     if (fabs(linear_vel) > linear_vel_cap)
         linear_vel = linear_vel_cap * fabs(linear_vel) / linear_vel;
 

@@ -1,20 +1,24 @@
-//
-// Created by robyncastro on 10/11/17.
-//
+/*
+ * Created By: Robyn Castro
+ * Created On: November 10th, 2017
+ * Description: Utilities to compute vector and point math
+ *
+ */
 #include <LinearAlgebra.h>
 
 LinearAlgebra::LinearAlgebra() {
     // Empty Constructor
 }
 
-double LinearAlgebra::distanceBetweenPoints(geometry_msgs::Point a, geometry_msgs::Point b) {
-    return sqrt(pow(b.y - a.y, 2) + pow(b.x - a.x, 2));
+double LinearAlgebra::distanceBetweenPoints(geometry_msgs::Point point1, geometry_msgs::Point point2) {
+    // Euclidean distance
+    return sqrt(pow(point1.y - point2.y, 2) + pow(point1.x - point2.x, 2));
 }
 
-geometry_msgs::Point LinearAlgebra::getMiddlePoint(geometry_msgs::Point a, geometry_msgs::Point b) {
+geometry_msgs::Point LinearAlgebra::getMiddlePoint(geometry_msgs::Point point1, geometry_msgs::Point point2) {
     geometry_msgs::Point hole;
-    hole.x = (a.x + b.x) / 2;
-    hole.y = (a.y + b.y) / 2;
+    hole.x = (point1.x + point2.x) / 2;
+    hole.y = (point1.y + point2.y) / 2;
 
     return hole;
 }
@@ -27,9 +31,11 @@ pair<geometry_msgs::Point, geometry_msgs::Point> LinearAlgebra::getClosestPair(
     closest_pair.first = points1[0];
     closest_pair.second = points2[0];
 
+    // Cross compare all points
     for (int i = 0; i < points1.size(); i++) {
         for (int j = 0; j < points2.size(); j++) {
             double cur_distance = distanceBetweenPoints(points1[i], points2[j]);
+            // If distance between the current points is less than the current closest, update the closest pair
             if (cur_distance < closest_distance) {
                 closest_distance = cur_distance;
                 closest_pair.first = points1[i];

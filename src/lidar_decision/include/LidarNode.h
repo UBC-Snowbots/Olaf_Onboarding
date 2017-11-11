@@ -12,7 +12,6 @@
 
 // Lidar Specific
 #include <LidarDecision.h>
-#include <LidarObstacleManager.h>
 
 // ROS
 #include <ros/ros.h>
@@ -26,22 +25,6 @@ class LidarNode {
 public:
     LidarNode(int argc, char **argv, string node_name);
 private:
-    ros::Subscriber laser_scan_subscriber;
-
-    // Motion Publisher
-    ros::Publisher twist_publisher;
-
-    // Debug Publishers
-    ros::Publisher cone1_debug_publisher;
-    ros::Publisher cone2_debug_publisher;
-    ros::Publisher hole_debug_publisher;
-
-    // Controller
-    LidarDecision lidar_decision;
-
-    // Rviz
-    RvizUtils rviz_utils;
-
     /**
      * Callback function for when a new laser scan is received
      *
@@ -80,20 +63,31 @@ private:
      */
     void initPublishers(ros::NodeHandle private_nh);
 
-    /**
-     * Set
-     */
-
     // Decision parameters
     double angular_vel_cap;
     double linear_vel_cap;
     double linear_vel_multiplier;
     double angular_vel_multiplier;
     double theta_scaling_multiplier;
+    double max_distance_from_goal;
 
     // Obstacle Manager parameters
     double cone_grouping_tolerance;
     double max_scan_distance;
+
+    // Lidar Subscriber
+    ros::Subscriber laser_scan_subscriber;
+
+    // Motion Publisher
+    ros::Publisher twist_publisher;
+
+    // Debug Publishers
+    ros::Publisher cone1_debug_publisher;
+    ros::Publisher cone2_debug_publisher;
+    ros::Publisher hole_debug_publisher;
+
+    // Controller
+    LidarDecision lidar_decision;
 
 };
 

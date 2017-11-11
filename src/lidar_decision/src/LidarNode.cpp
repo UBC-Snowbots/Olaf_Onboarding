@@ -1,7 +1,9 @@
-//
-// Created by robyncastro on 10/11/17.
-//
-
+/*
+ * Created By: Robyn Castro
+ * Created On: November 10th, 2017
+ * Description: Takes in a laser scan and publishes a twist, and visualisation messages.
+ *
+ */
 #include <LidarNode.h>
 
 LidarNode::LidarNode(int argc, char **argv, std::string node_name) {
@@ -16,30 +18,26 @@ LidarNode::LidarNode(int argc, char **argv, std::string node_name) {
     initSubscribers(nh);
     initPublishers(private_nh);
 
-    // Setup Controller
     lidar_decision = LidarDecision(angular_vel_cap, linear_vel_cap, angular_vel_multiplier, linear_vel_multiplier,
-                                   theta_scaling_multiplier);
-    // Setup Rviz Utilities
-    rviz_utils = RvizUtils();
+                                   theta_scaling_multiplier, max_distance_from_goal);
 
 }
 
 void LidarNode::laserScanCallBack(const sensor_msgs::LaserScan laser_scan) {
     // Setup Obstacle Manager
-    LidarObstacleManager obstacle_manager = LidarObstacleManager(laser_scan);
+    LidarObstacleManager obstacle_manager = LidarObstacleManager(laser_scan, max_scan_distance, cone_grouping_tolerance);
 
-    // Merge Points based on distance
     vector<vector<geometry_msgs::Point>> merged_points = obstacle_manager.getMergedPoints();
 
-    // Find the hole.
+    // Find the hole.cd
     geometry_msgs::Point hole = obstacle_manager.getHole();
 
     // Publish RViz markers
     vector<geometry_msgs::Point> hole_vector;
     hole_vector.push_back(hole);
-    cone1_debug_publisher.publish(rviz_utils.displayPoints(merged_points[0], 'b'));
-    cone2_debug_publisher.publish(rviz_utils.displayPoints(merged_points[1], 'g'));
-    hole_debug_publisher.publish(rviz_utils.displayPoint(hole, 'r'));
+    cone1_debug_publisher.publish(RvizUtils().displayPoints(merged_points[0], 'b'));
+    cone2_debug_publisher.publish(RvizUtils().displayPoints(merged_points[1], 'g'));
+    hole_debug_publisher.publish(RvizUtils().displayPoint(hole, 'r'));
 
     geometry_msgs::Twist follow_hole = lidar_decision.determineDesiredMotion(merged_points, hole);
     publishTwist(follow_hole);
@@ -55,10 +53,11 @@ void LidarNode::initDecisionParams(ros::NodeHandle private_nh) {
     SB_getParam(private_nh, "angular_vel_multiplier", angular_vel_multiplier, 1.0);
     SB_getParam(private_nh, "linear_vel_multiplier", linear_vel_multiplier, 1.0);
     SB_getParam(private_nh, "theta_scaling_multiplier", theta_scaling_multiplier, 1.0);
+    SB_getParam(private_nh, "max_distance_from_goal", max_distance_from_goal, 1.0);
 }
 
 void LidarNode::initObstacleManagerParams(ros::NodeHandle private_nh) {
-    SB_getParam(private_nh, "cone_grouping_tolerance", cone_grouping_tolerance, 1.0);
+    SB_getParam(private_nh, "cone_grouping_tolerance", cone_grouping_tolerance, 0.2);
     SB_getParam(private_nh, "max_scan_distance", max_scan_distance, 1.0);
 }
 

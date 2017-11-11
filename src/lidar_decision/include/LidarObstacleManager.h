@@ -5,18 +5,19 @@
 #ifndef LIDAR_LIDAROBSTACLEMANAGER_H
 #define LIDAR_LIDAROBSTACLEMANAGER_H
 
+// Messages
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Point.h>
-#include <visualization_msgs/Marker.h>
-#include <ros/ros.h>
+
+// Utilities
 #include <LinearAlgebra.h>
 
 using namespace std;
 
 class LidarObstacleManager {
 public:
-    LidarObstacleManager(sensor_msgs::LaserScan);
+    LidarObstacleManager(sensor_msgs::LaserScan, double max_scan_distance, double cone_grouping_tolerance);
 
     vector<geometry_msgs::Point> getPoints();
 
@@ -36,9 +37,28 @@ private:
      */
     vector<geometry_msgs::Point> constructPoints(sensor_msgs::LaserScan laser_scan);
 
-    vector<vector<geometry_msgs::Point>> mergePoints();
+    /**
+     * Check if a point is valid
+     *
+     * @param point the point to be checked
+     */
+    bool validatePoint(float range, float range_max, float range_min);
+
+    /**
+     * Convert polar point to cartesian point
+     *
+     * @param range
+     * @param theta
+     */
+    geometry_msgs::Point polarToCartesian(float range, float theta);
+
+    vector<vector<geometry_msgs::Point>> mergePoints(vector<geometry_msgs::Point> points);
 
     bool findMatch(vector<vector<geometry_msgs::Point>> &merged_points, geometry_msgs::Point point);
+
+    // Obstacle Manager parameters
+    double cone_grouping_tolerance;
+    double max_scan_distance;
 };
 
 #endif //LIDAR_LIDAROBSTACLEMANAGER_H

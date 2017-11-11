@@ -5,15 +5,36 @@
 #ifndef LIDAR_RVIZUTILS_H
 #define LIDAR_RVIZUTILS_H
 
+// Messages
 #include <geometry_msgs/Point.h>
 #include <visualization_msgs/Marker.h>
 
 using namespace std;
 class RvizUtils {
 public:
+    /**
+     * Turn the points into a marker for rviz
+     *
+     * @param points the points to be converted
+     * @param color the color of the points
+     */
     static visualization_msgs::Marker displayPoints(vector<geometry_msgs::Point> points, char color);
+
+    /**
+     * Turn the point into a marker for rviz
+     *
+     * @param point the points to be converted
+     * @param color the color of the point
+     */
     static visualization_msgs::Marker displayPoint(geometry_msgs::Point obstacle, char color);
 private:
+
+    /**
+     * Sets the properties of the marker (shape, color, header)
+     *
+     * @param marker
+     * @param color
+     */
     static void initialiseMarkerParams(visualization_msgs::Marker &marker, char color);
 };
 

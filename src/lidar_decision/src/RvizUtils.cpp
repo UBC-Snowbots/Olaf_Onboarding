@@ -1,7 +1,9 @@
-//
-// Created by robyncastro on 10/11/17.
-//
-
+/*
+ * Created By: Robyn Castro
+ * Created On: November 10th, 2017
+ * Description: Utilities to create visualisation messages
+ *
+ */
 #include <RvizUtils.h>
 
 visualization_msgs::Marker RvizUtils::displayPoints(vector<geometry_msgs::Point> obstacles, char color) {
@@ -27,15 +29,16 @@ visualization_msgs::Marker RvizUtils::displayPoint(geometry_msgs::Point obstacle
 }
 
 void RvizUtils::initialiseMarkerParams(visualization_msgs::Marker &marker, char color) {
+    // Set the header
     marker.header.frame_id = "laser";
     marker.header.stamp = ros::Time::now();
     marker.ns = "debug";
     marker.action = visualization_msgs::Marker::ADD;
     marker.pose.orientation.w = 1.0;
     marker.id = 0;
-
     marker.type = visualization_msgs::Marker::POINTS;
 
+    // Set the shape
     marker.scale.x = 0.1;
     marker.scale.y = 0.1;
 
