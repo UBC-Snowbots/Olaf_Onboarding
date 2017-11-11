@@ -1,15 +1,10 @@
-/*
- * Created By: Gareth Ellis
- * Created On: July 16th, 2016
- * Description: Tests for MyNode
- */
-
 #include <MyNode.h>
 #include <gtest/gtest.h>
 
-TEST(MyNode, addExclamationPoint){
-    EXPECT_EQ("!", MyClass::addCharacterToString("", "!"));
-    EXPECT_EQ("Hello!", MyClass::addCharacterToString("Hello", "!"));
+TEST(AvoidObstacles, WhatWeAreTesting){
+
+    //Takes in laser msg, outputs velocity msg
+    EXPECT_EQ(nullptr, MyClass::avoidObstacles(nullptr));
 }
 
 int main(int argc, char **argv) {

@@ -38,64 +38,19 @@ void MyClass::processLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan) {
 geometry_msgs::Twist MyClass::avoidObstacles(sensor_msgs::LaserScan laser_msg) {
 
     geometry_msgs::Twist vel_msg; //Initialize velocity message
-    vel_msg.linear.x = 0.5; //Keep forward velocity constant
 
-    //ranges[0] to ranges[numIndices] represents the distances between
-    //the min and max angle scan
-    int numIndices = (laser_msg.angle_max - laser_msg.angle_min)/laser_msg.angle_increment;
+    //Creates a vector of points that represents locations of obstacles in 2d points
+    std::vector<Point> points = createPoints(laser_msg);
 
-    //These represent the refined index range for our gap search (starting at the cone edges)
-    int startIndex = 0;
-    int endIndex = numIndices;
+    //locationOfGap has point that represents center of largest gap
+    Point locationOfGap = largestGap(points);
 
-    //Find startIndex
-    for (int i=0; i<=numIndices; i++) {
-        //If distance is within 2 meters
-        if (laser_msg.ranges[i] <= 2) {
-            startIndex = i;
-            break;
-        }
-    }
-    //Find endIndex
-    for (int i=numIndices; i>=0; i--) {
-        if (laser_msg.ranges[i] <= 2) {
-            endIndex = i;
-            break;
-        }
-    }
-    //If we can't find either edge, or if we're surrounded by edges, just go forward
-    if (startIndex == 0 && endIndex == numIndices) {
-        return vel_msg;
-    }
+    //Find the angle of the center gap
+    float ang_gap = atan(locationOfGap.y/locationOfGap.x);
 
-    int largestGap = 0; //current largest gap measured in indices
-    int currentGap = 0;
-    int endIndexGap; //end index of largest gap
+    vel_msg.linear.x = 1; //Keep forward velocity constant
+    vel_msg.angular.z = ang_gap; //Turn depending on angle of gap
 
-    //Find the largest gap in the edge range
-    for (int i = startIndex; i <= endIndex; i++) {
-        if (laser_msg.ranges[i] > 2) {
-            currentGap ++;
-            if (currentGap > largestGap){
-                largestGap = currentGap;
-                endIndexGap = i;
-            }
-        }
-        else {
-            currentGap = 0;
-        }
-    }
-
-    //Angle of gap is the angle that points to the midpoint of the largest gap
-    float angle_of_gap = laser_msg.angle_min + ((endIndexGap - largestGap/2) * laser_msg.angle_increment);
-
-    //Turn robot towards the gap
-    if (angle_of_gap > 0){
-        vel_msg.angular.z = -1;
-    }
-    else {
-        vel_msg.angular.z = 1;
-    }
     return vel_msg;
 }
 
@@ -104,3 +59,75 @@ geometry_msgs::Twist MyClass::avoidObstacles(sensor_msgs::LaserScan laser_msg) {
 void MyClass::republishVelocity(geometry_msgs::Twist vel_msg_to_publish) {
     velocity_publisher.publish(vel_msg_to_publish);
 }
+
+/**
+ * Construct a vector of points. The 0th index starts from negative angles (right side of robot)
+ * @param laser_msg
+ * @return
+ */
+std::vector<Point> MyClass::createPoints(sensor_msgs::LaserScan laser_msg) {
+
+    float max_dist = laser_msg.range_max;
+    float min_dist = laser_msg.range_min;
+    float max_ang = laser_msg.angle_max;
+    float min_ang = laser_msg.angle_min;
+    float ang_inc = laser_msg.angle_increment;
+
+    int numIndices = (max_ang-min_ang)/ang_inc;
+
+    std::vector<float> ranges = laser_msg.ranges;
+    std::vector<Point> points; // Holds 2d points
+
+    for (int i = 0; i < numIndices; i++){
+        //If range is valid, store as a 2d point
+       if (ranges[i] <= max_dist && ranges[i] >= min_dist) {
+
+           float angle = min_ang + i * ang_inc;
+           float x = ranges[i] * cos(angle);
+           float y = ranges[i] * sin(angle);
+
+           Point point;
+           point.x = x;
+           point.y = y;
+
+           points.push_back(point);
+       }
+    }
+    return points;
+}
+
+/**
+ * Find the largest gap and return a new point that represents the center
+ * @param laser_msg
+ * @param points
+ * @return
+ */
+Point MyClass::largestGap(std::vector<Point> points){
+
+    Point centerPoint;
+
+    float longest_dist = 0;
+
+    for (int i = 1; i < points.size(); i++){
+        float current_dist = getDist(points[i-1],points[i]);
+        if (current_dist > longest_dist){
+            longest_dist = current_dist;
+            centerPoint.x = (points[i].x + points[i-1].x)/2;
+            centerPoint.y = (points[i].y + points[i-1].y)/2;
+        }
+    }
+
+    return centerPoint;
+}
+
+float MyClass::getDist(Point p1, Point p2){
+    float x1 = p1.x;
+    float y1 = p1.y;
+    float x2 = p2.x;
+    float y2 = p2.y;
+
+    return sqrt(pow((y2-y1),2) + pow((x2-x1),2));
+}
+
+
+
