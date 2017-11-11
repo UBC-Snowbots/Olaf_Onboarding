@@ -5,12 +5,14 @@
 #ifndef OLAF_ONBOARDING_LIDARDECISION_H
 #define OLAF_ONBOARDING_LIDARDECISION_H
 
-#include <iostream>
-#include <sensor_msgs/LaserScan.h>
+// Messages
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Point.h>
-#include <ros/ros.h>
+
+// Obstacle Manager
 #include <LidarObstacleManager.h>
+
+// Utilities
 #include <LinearAlgebra.h>
 
 using namespace std;
@@ -22,11 +24,32 @@ public:
 
     LidarDecision();
 
+    /**
+     * Determines the motion in order to get to the hole
+     *
+     * @returns the twist motion
+     */
     geometry_msgs::Twist determineDesiredMotion(vector<vector<geometry_msgs::Point>> merged_points,
                                                 geometry_msgs::Point hole);
 
+    /**
+     * Determines the turning velocity
+     *
+     * @return the turning velocity
+     */
     double determineTurningVel(double theta, double distance);
+
+    /**
+     * Determines the moving velocity
+     *
+     * @return the moving velocity
+     */
     double determineMovingVel(double theta, double distance);
+
+    /**
+     * Set the components of the twist that we don't care about to 0.
+     *
+     */
     void initTwist(geometry_msgs::Twist &twist);
 
 private:
