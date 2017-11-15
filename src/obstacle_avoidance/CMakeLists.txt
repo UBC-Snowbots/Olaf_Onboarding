@@ -135,7 +135,7 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(sample_package_node src/sample_package_node.cpp)
-add_executable(obstacle_avoidance src/obstacle_avoidance.cpp src/MyNode.cpp include/MyNode.h)
+add_executable(obstacle_avoidance src/obstacle_avoidance.cpp src/OANode.cpp include/OANode.h)
 
 
 ## Add cmake target dependencies of the executable
@@ -194,7 +194,7 @@ target_link_libraries(obstacle_avoidance ${catkin_LIBRARIES} ${sb_utils_LIBRARIE
 if (CATKIN_ENABLE_TESTING)
 
     # Adding gtests to the package
-    catkin_add_gtest(obstacle_avoidance-test test/obstacle_avoidance-test.cpp src/MyNode.cpp include/MyNode.h)
+    catkin_add_gtest(obstacle_avoidance-test test/obstacle_avoidance-test.cpp src/OANode.cpp include/OANode.h)
     target_link_libraries(obstacle_avoidance-test ${catkin_LIBRARIES})
 
     # Adding rostest to the package
