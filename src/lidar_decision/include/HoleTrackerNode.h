@@ -2,8 +2,8 @@
 // Created by robyncastro on 10/11/17.
 //
 
-#ifndef LIDAR_LIDARNODE_H
-#define LIDAR_LIDARNODE_H
+#ifndef HOLE_TRACKER_HOLETRACKERNODE_H
+#define HOLE_TRACKER_HOLETRACKERNODE_H
 
 // Messages
 #include <sensor_msgs/LaserScan.h>
@@ -21,9 +21,9 @@
 #include <RvizUtils.h>
 
 using namespace std;
-class LidarNode {
+class HoleTrackerNode {
 public:
-    LidarNode(int argc, char **argv, string node_name);
+    HoleTrackerNode(int argc, char **argv, string node_name);
 private:
     /**
      * Callback function for when a new laser scan is received
@@ -92,4 +92,4 @@ private:
 };
 
 
-#endif //LIDAR_LIDARNODE_H
+#endif //HOLE_TRACKER_HOLETRACKERNODE_H

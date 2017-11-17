@@ -36,6 +36,7 @@ bool LidarObstacleManager::validatePoint(float range, float range_min, float ran
 
 }
 
+// Sort the vectors based on size
 bool sortMerges(vector<geometry_msgs::Point> a, vector<geometry_msgs::Point> b) {
     return a.size() > b.size();
 }

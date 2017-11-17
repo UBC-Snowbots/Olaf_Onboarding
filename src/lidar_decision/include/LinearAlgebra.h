@@ -2,8 +2,8 @@
 // Created by robyncastro on 10/11/17.
 //
 
-#ifndef LIDAR_LINEARALGEBRA_H
-#define LIDAR_LINEARALGEBRA_H
+#ifndef HOLE_TRACKER_LINEARALGEBRA_H
+#define HOLE_TRACKER_LINEARALGEBRA_H
 
 // Messages
 #include <geometry_msgs/Point.h>
@@ -46,4 +46,4 @@ public:
 private:
 };
 
-#endif //LIDAR_LINEARALGEBRA_H
+#endif //HOLE_TRACKER_LINEARALGEBRA_H

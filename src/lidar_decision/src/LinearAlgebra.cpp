@@ -17,8 +17,8 @@ double LinearAlgebra::distanceBetweenPoints(geometry_msgs::Point point1, geometr
 
 geometry_msgs::Point LinearAlgebra::getMiddlePoint(geometry_msgs::Point point1, geometry_msgs::Point point2) {
     geometry_msgs::Point hole;
-    hole.x = (point1.x + point2.x) / 2;
-    hole.y = (point1.y + point2.y) / 2;
+    hole.x = (point1.x + point2.x) / 2.0;
+    hole.y = (point1.y + point2.y) / 2.0;
 
     return hole;
 }
@@ -50,6 +50,11 @@ pair<geometry_msgs::Point, geometry_msgs::Point> LinearAlgebra::getClosestPair(
 double LinearAlgebra::getAngleToPoint(geometry_msgs::Point point) {
     if (point.x == 0)
         return 0;
-    else
-        return atan(point.y / point.x);
+
+    double angle = atan(point.y / point.x);
+
+    if (point.x < 0)
+        angle = -angle + (M_PI / 2.0) * (-fabs(angle) / angle);
+
+    return angle;
 }

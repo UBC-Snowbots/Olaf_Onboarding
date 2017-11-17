@@ -2,8 +2,8 @@
 // Created by robyncastro on 28/10/17.
 //
 
-#ifndef OLAF_ONBOARDING_LIDARDECISION_H
-#define OLAF_ONBOARDING_LIDARDECISION_H
+#ifndef HOLE_TRACKER_LIDARDECISION_H
+#define HOLE_TRACKER_LIDARDECISION_H
 
 // Messages
 #include <geometry_msgs/Twist.h>
@@ -22,6 +22,7 @@ public:
     LidarDecision(double angular_vel_cap, double linear_vel_cap, double angular_vel_multiplier,
                   double linear_vel_multiplier, double theta_scaling_multiplier, double max_distance_from_goal);
 
+    // Required empty constructor
     LidarDecision();
 
     /**
@@ -63,4 +64,4 @@ private:
     double max_distance_from_goal;
 };
 
-#endif //OLAF_ONBOARDING_LIDARDECISION_H
+#endif //HOLE_TRACKER_LIDARDECISION_H

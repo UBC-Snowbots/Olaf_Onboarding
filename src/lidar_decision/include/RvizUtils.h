@@ -2,8 +2,8 @@
 // Created by robyncastro on 10/11/17.
 //
 
-#ifndef LIDAR_RVIZUTILS_H
-#define LIDAR_RVIZUTILS_H
+#ifndef HOLE_TRACKER_RVIZUTILS_H
+#define HOLE_TRACKER_RVIZUTILS_H
 
 // Messages
 #include <geometry_msgs/Point.h>
@@ -39,4 +39,4 @@ private:
 };
 
 
-#endif //LIDAR_RVIZUTILS_H
+#endif //HOLE_TRACKER_RVIZUTILS_H

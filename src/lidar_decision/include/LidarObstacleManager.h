@@ -2,8 +2,8 @@
 // Created by robyncastro on 10/11/17.
 //
 
-#ifndef LIDAR_LIDAROBSTACLEMANAGER_H
-#define LIDAR_LIDAROBSTACLEMANAGER_H
+#ifndef HOLE_TRACKER_LIDAROBSTACLEMANAGER_H
+#define HOLE_TRACKER_LIDAROBSTACLEMANAGER_H
 
 // Messages
 #include <sensor_msgs/LaserScan.h>
@@ -74,4 +74,4 @@ private:
     double max_scan_distance;
 };
 
-#endif //LIDAR_LIDAROBSTACLEMANAGER_H
+#endif //HOLE_TRACKER_LIDAROBSTACLEMANAGER_H
