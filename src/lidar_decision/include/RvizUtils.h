@@ -10,6 +10,8 @@
 #include <visualization_msgs/Marker.h>
 
 using namespace std;
+using namespace visualization_msgs;
+
 class RvizUtils {
 public:
     /**
@@ -18,7 +20,8 @@ public:
      * @param points the points to be converted
      * @param color the color of the points
      */
-    static visualization_msgs::Marker displayPoints(vector<geometry_msgs::Point> points, char color);
+    static Marker displayPoints(vector<geometry_msgs::Point> points, Marker::_color_type color,
+                                Marker::_scale_type scale, string frame_id, string ns);
 
     /**
      * Turn the point into a marker for rviz
@@ -26,7 +29,18 @@ public:
      * @param point the points to be converted
      * @param color the color of the point
      */
-    static visualization_msgs::Marker displayPoint(geometry_msgs::Point obstacle, char color);
+    static Marker displayPoint(geometry_msgs::Point point, Marker::_color_type color, Marker::_scale_type scale,
+                               string frame_id, string ns);
+
+    /**
+     *
+     */
+    static Marker::_color_type createMarkerColor(float r, float g, float b, float a);
+
+    /**
+     *
+     */
+    static Marker::_scale_type createrMarkerScale(float x, float y, float z);
 private:
 
     /**
@@ -35,7 +49,8 @@ private:
      * @param marker
      * @param color
      */
-    static void initialiseMarkerParams(visualization_msgs::Marker &marker, char color);
+    static void initialiseMarkerHeader(Marker &marker, string frame_id, string ns);
+
 };
 
 

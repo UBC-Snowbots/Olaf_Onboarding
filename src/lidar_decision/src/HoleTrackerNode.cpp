@@ -32,11 +32,17 @@ void HoleTrackerNode::laserScanCallBack(const sensor_msgs::LaserScan laser_scan)
     geometry_msgs::Point hole = obstacle_manager.getHole();
 
     // Publish RViz markers
-    vector<geometry_msgs::Point> hole_vector;
-    hole_vector.push_back(hole);
-    cone1_debug_publisher.publish(RvizUtils().displayPoints(merged_points[0], 'b'));
-    cone2_debug_publisher.publish(RvizUtils().displayPoints(merged_points[1], 'g'));
-    hole_debug_publisher.publish(RvizUtils().displayPoint(hole, 'r'));
+    visualization_msgs::Marker::_color_type red = RvizUtils().createMarkerColor(1.0f, 0, 0, 1.0f);
+    visualization_msgs::Marker::_color_type green = RvizUtils().createMarkerColor(0, 1.0f, 0, 1.0f);
+    visualization_msgs::Marker::_color_type blue = RvizUtils().createMarkerColor(0, 0, 1.0f, 1.0f);
+    visualization_msgs::Marker::_scale_type scale = RvizUtils().createrMarkerScale(0.1, 0.1, 0.1);
+
+    string frame_id = "laser";
+    string ns = "debug";
+
+    cone1_debug_publisher.publish(RvizUtils().displayPoints(merged_points[0], blue, scale, frame_id, ns));
+    cone2_debug_publisher.publish(RvizUtils().displayPoints(merged_points[1], green, scale, frame_id, ns));
+    hole_debug_publisher.publish(RvizUtils().displayPoint(hole, red, scale, frame_id, ns));
 
     geometry_msgs::Twist follow_hole = lidar_decision.determineDesiredMotion(merged_points, hole);
     publishTwist(follow_hole);

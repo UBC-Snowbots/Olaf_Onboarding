@@ -6,56 +6,65 @@
  */
 #include <RvizUtils.h>
 
-visualization_msgs::Marker RvizUtils::displayPoints(vector<geometry_msgs::Point> obstacles, char color) {
-    visualization_msgs::Marker points;
+using namespace visualization_msgs;
+Marker RvizUtils::displayPoints(vector<geometry_msgs::Point> points, Marker::_color_type color,
+                                                    Marker::_scale_type scale, string frame_id, string ns) {
+    Marker marker;
 
-    initialiseMarkerParams(points, color);
+    initialiseMarkerHeader(marker, frame_id, ns);
 
-    // Set the points
-    points.points = obstacles;
-
-    return points;
-}
-
-visualization_msgs::Marker RvizUtils::displayPoint(geometry_msgs::Point obstacle, char color) {
-    visualization_msgs::Marker point;
-
-    initialiseMarkerParams(point, color);
+    // Set the shape & color
+    marker.color = color;
+    marker.scale = scale;
 
     // Set the points
-    point.points.push_back(obstacle);
+    marker.points = points;
 
-    return point;
+    return marker;
 }
 
-void RvizUtils::initialiseMarkerParams(visualization_msgs::Marker &marker, char color) {
-    // Set the header
-    marker.header.frame_id = "laser";
+Marker RvizUtils::displayPoint(geometry_msgs::Point point, Marker::_color_type color,
+                                                   Marker::_scale_type scale, string frame_id, string ns) {
+    Marker marker;
+
+    initialiseMarkerHeader(marker, frame_id, ns);
+
+    // Set the display properties
+    marker.color = color;
+    marker.scale = scale;
+
+    // Set the points
+    marker.points.push_back(point);
+
+    return marker;
+}
+
+Marker::_color_type RvizUtils::createMarkerColor(float r, float g, float b, float a) {
+    Marker::_color_type color;
+    color.r = r;
+    color.g = g;
+    color.b = b;
+    color.a = a;
+
+    return color;
+}
+
+Marker::_scale_type RvizUtils::createrMarkerScale(float x, float y, float z) {
+    Marker::_scale_type scale;
+    scale.x = x;
+    scale.y = y;
+    scale.z = z;
+
+    return scale;
+
+}
+void RvizUtils::initialiseMarkerHeader(Marker &marker, string frame_id, string ns) {
+
+    marker.header.frame_id = frame_id;
+    marker.ns = ns;
+    marker.type = Marker::POINTS;
     marker.header.stamp = ros::Time::now();
-    marker.ns = "debug";
-    marker.action = visualization_msgs::Marker::ADD;
+    marker.action = Marker::ADD;
     marker.pose.orientation.w = 1.0;
     marker.id = 0;
-    marker.type = visualization_msgs::Marker::POINTS;
-
-    // Set the shape
-    marker.scale.x = 0.1;
-    marker.scale.y = 0.1;
-
-    // Set the color
-    switch (color) {
-        case 'r':
-            marker.color.r = 1.0f;
-            break;
-        case 'g':
-            marker.color.g = 1.0f;
-            break;
-        case 'b':
-            marker.color.b = 1.0f;
-            break;
-        default:
-            marker.color.r = 1.0f;
-    }
-    // Set the transparency
-    marker.color.a = 1.0;
 }
