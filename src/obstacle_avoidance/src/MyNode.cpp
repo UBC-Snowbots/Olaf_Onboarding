@@ -40,9 +40,10 @@ geometry_msgs::Twist MyClass::avoidObstacles(sensor_msgs::LaserScan laser_msg) {
     geometry_msgs::Twist vel_msg; //Initialize velocity message
 
     //Creates a vector of points that represents locations of obstacles in 2d points
+    //Only points within the laser scanner's valid ranges will be considered
     std::vector<Point> points = createPoints(laser_msg);
 
-    //locationOfGap has point that represents center of largest gap
+    //locationOfGap contains point that represents center of largest gap
     Point locationOfGap = largestGap(points);
 
     //Find the angle of the center gap

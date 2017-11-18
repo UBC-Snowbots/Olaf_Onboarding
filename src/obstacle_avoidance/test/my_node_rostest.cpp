@@ -35,7 +35,7 @@ public:
     }
 };
 
-TEST_F(MyNodeTest, testObstacleAvoidance){
+TEST_F(MyNodeTest, testGapInCenter){
 
     //Publishes a custom laser_message to the test node
     sensor_msgs::LaserScan laser_msg;
@@ -45,7 +45,7 @@ TEST_F(MyNodeTest, testObstacleAvoidance){
     laser_msg.angle_increment = 0.5;
     laser_msg.range_max = 5.0; //5m
     laser_msg.range_min = 0.0; //0m
-    laser_msg.ranges = {6.0, 1.5, 3.0, 2.0, 2.0, 6.0, 7.0, 6.0, 7.0}; //Should have 9 ranges
+    laser_msg.ranges = {9.9, 0.5, 9.9, 9.9, 9.9, 9.9, 9.9, 0.5, 9.9}; //Should have 9 ranges
     //Note that ranges start at -angles to +angles
 
     test_publisher.publish(laser_msg);
@@ -59,9 +59,35 @@ TEST_F(MyNodeTest, testObstacleAvoidance){
     ros::spinOnce();
 
     EXPECT_EQ(1, lin_x_vel);
-    EXPECT_EQ(2, ang_z_vel); //?
+    EXPECT_EQ(0, ang_z_vel);
 }
 
+TEST_F(MyNodeTest, testGapOnRight){
+
+    //Publishes a custom laser_message to the test node
+    sensor_msgs::LaserScan laser_msg;
+
+    laser_msg.angle_max = 2.0; //In Radians
+    laser_msg.angle_min = -2.0;  //In Radians
+    laser_msg.angle_increment = 0.5;
+    laser_msg.range_max = 5.0; //5m
+    laser_msg.range_min = 0.0; //0m
+    laser_msg.ranges = {9.9, 0.5, 9.9, 9.9, 9.9, 0.5, 0.5, 0.5, 9.9}; //Should have 9 ranges
+    //Note that ranges start at -angles to +angles
+
+    test_publisher.publish(laser_msg);
+
+    // Wait for the message to get passed around
+    ros::Rate loop_rate(1);
+    loop_rate.sleep();
+
+    // spinOnce allows ros to actually process your callbacks
+    // for the curious: http://answers.ros.org/question/11887/significance-of-rosspinonce/
+    ros::spinOnce();
+
+    EXPECT_EQ(1, lin_x_vel);
+    EXPECT_EQ(-0.5, ang_z_vel);
+}
 
 int main(int argc, char **argv) {
     // !! Don't forget to initialize ROS, since this is a test within the ros framework !!
