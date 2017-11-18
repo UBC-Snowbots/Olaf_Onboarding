@@ -18,14 +18,14 @@ struct Point {
 class MyClass {
 public:
     MyClass(int argc, char **argv, std::string node_name);
+    static float getDist(Point p1, Point p2);
+    static Point largestGap(std::vector<Point> points);
+    static std::vector<Point> createPoints(sensor_msgs::LaserScan laser_msg);
 
 private:
     void republishVelocity(geometry_msgs::Twist);
     void processLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan_message);
     geometry_msgs::Twist avoidObstacles(sensor_msgs::LaserScan);
-    std::vector<Point> createPoints(sensor_msgs::LaserScan laser_msg);
-    Point largestGap(std::vector<Point> points);
-    float getDist(Point p1, Point p2);
 
     ros::Subscriber laser_subscriber;
     ros::Publisher velocity_publisher;

@@ -29,7 +29,7 @@ void MyClass::processLaserScan(const sensor_msgs::LaserScan::ConstPtr& scan) {
     laser_message.range_max = scan->range_max;
     laser_message.range_min = scan->range_min;
 
-    vel_msg = avoidObstacles(laser_message); //Process ranges and return velocity
+    vel_msg = avoidObstacles(laser_message); //Process ranges and return velocity message
     republishVelocity(vel_msg); //Publish velocity
 }
 
@@ -79,7 +79,7 @@ std::vector<Point> MyClass::createPoints(sensor_msgs::LaserScan laser_msg) {
     std::vector<Point> points; // Holds 2d points
 
     for (int i = 0; i < numIndices; i++){
-        //If range is valid, store as a 2d point
+        //If range is valid (within min and max range), store as a 2d point
        if (ranges[i] <= max_dist && ranges[i] >= min_dist) {
 
            float angle = min_ang + i * ang_inc;
@@ -99,7 +99,7 @@ std::vector<Point> MyClass::createPoints(sensor_msgs::LaserScan laser_msg) {
 /**
  * Find the largest gap and return a new point that represents the center
  * @param laser_msg
- * @param points
+ * @param points vector of points must have size >= 2
  * @return
  */
 Point MyClass::largestGap(std::vector<Point> points){
@@ -108,12 +108,12 @@ Point MyClass::largestGap(std::vector<Point> points){
 
     float longest_dist = 0;
 
-    for (int i = 1; i < points.size(); i++){
-        float current_dist = getDist(points[i-1],points[i]);
+    for (int i = 0; i < points.size()-1; i++){
+        float current_dist = getDist(points[i],points[i+1]); //Distance between successive points
         if (current_dist > longest_dist){
             longest_dist = current_dist;
-            centerPoint.x = (points[i].x + points[i-1].x)/2;
-            centerPoint.y = (points[i].y + points[i-1].y)/2;
+            centerPoint.x = (points[i].x + points[i+1].x)/2.0;
+            centerPoint.y = (points[i].y + points[i+1].y)/2.0;
         }
     }
 
@@ -128,6 +128,3 @@ float MyClass::getDist(Point p1, Point p2){
 
     return sqrt(pow((y2-y1),2) + pow((x2-x1),2));
 }
-
-
-
