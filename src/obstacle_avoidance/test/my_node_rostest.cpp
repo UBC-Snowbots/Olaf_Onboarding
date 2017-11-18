@@ -5,9 +5,12 @@
  */
 
 
-#include <MyNode.h>
+//#include <MyNode.h>
 #include <gtest/gtest.h>
+#include <ObstacleAvoider.h>
 #include <ros/ros.h>
+#include <sensor_msgs/LaserScan.h>
+#include <geometry_msgs/Twist.h>
 
 
 /**
@@ -21,8 +24,8 @@
 class MyNodeTest : public testing::Test{
 protected:
     virtual void SetUp(){
-        test_publisher = nh_.advertise<std_msgs::String>("subscribe_topic", 1);
-        test_subscriber = nh_.subscribe("/my_node/publish_topic", 1, &MyNodeTest::callback, this);
+        test_publisher = nh_.advertise<sensor_msgs::LaserScan>("/scan", 1);
+        test_subscriber = nh_.subscribe("/cmd_vel", 1, &MyNodeTest::callback, this);
 
         // Let the publishers and subscribers set itself up timely
         ros::Rate loop_rate(1);
@@ -30,33 +33,52 @@ protected:
     }
 
     ros::NodeHandle nh_;
-    std::string message_output;
+//    std::string message_output;
+    float message_output;
     ros::Publisher test_publisher;
     ros::Subscriber test_subscriber;
 
 public:
 
-    void callback(const std_msgs::String::ConstPtr msg){
-        message_output = msg->data.c_str();
+    void callback(const geometry_msgs::Twist::ConstPtr& scan){
+        message_output = scan->angular.z;
     }
 };
 
-TEST_F(MyNodeTest, exclamationMarkAppend){
+TEST_F(MyNodeTest, getAngularVel){
 
     // publishes "Hello" to the test node
-    std_msgs::String msg;
-    msg.data = "Hello";
-    test_publisher.publish(msg);
+//    st    d_msgs::String msg;
+//    msg.data = "Hello";
+    sensor_msgs::LaserScan scan;
 
-    // Wait for the message to get passed around
+    scan.angle_min = 0;
+    scan.angle_max = 1;
+    scan.angle_increment = 0.1;
+
+    scan.range_min = 5;
+    scan.range_max = 10;
+
+    scan.ranges = {5,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,5,5};
+
+    test_publisher.publish(scan);
     ros::Rate loop_rate(1);
     loop_rate.sleep();
+    ros::spinOnce();
+
+
+    // Wait for the message to get passed around
+    loop_rate.sleep();
+
+
 
     // spinOnce allows ros to actually process your callbacks
     // for the curious: http://answers.ros.org/question/11887/significance-of-rosspinonce/
     ros::spinOnce();
+    loop_rate.sleep();
+    ros::spinOnce();
 
-    EXPECT_EQ("Hello!", message_output);
+    EXPECT_FLOAT_EQ(0.45, message_output);
 }
 
 

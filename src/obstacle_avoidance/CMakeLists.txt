@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(sample_package)
+project(obstacle_avoidance)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -133,7 +133,7 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(sample_package_node src/sample_package_node.cpp)
-add_executable(my_node src/my_node.cpp src/MyNode.cpp include/MyNode.h)
+add_executable(my_node src/my_node.cpp src/MyNode.cpp include/MyNode.h src/ObstacleAvoider.cpp include/ObstacleAvoider.h)
 
 
 ## Add cmake target dependencies of the executable
@@ -192,7 +192,7 @@ target_link_libraries(my_node ${catkin_LIBRARIES} ${sb_utils_LIBRARIES})
 if (CATKIN_ENABLE_TESTING)
 
     # Adding gtests to the package
-    catkin_add_gtest(my-node-test test/my-node-test.cpp src/MyNode.cpp)
+    catkin_add_gtest(my-node-test test/my-node-test.cpp src/MyNode.cpp src/ObstacleAvoider.cpp)
     target_link_libraries(my-node-test ${catkin_LIBRARIES})
 
     # Adding rostest to the package

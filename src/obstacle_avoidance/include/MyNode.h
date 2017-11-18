@@ -13,6 +13,15 @@
 #include <std_msgs/String.h>
 #include <ros/ros.h>
 #include <sb_utils.h>
+#include <sensor_msgs/LaserScan.h>
+#include <geometry_msgs/Twist.h>
+#include <math.h>
+#include <ObstacleAvoider.h>
+#include <string>
+
+#define RAD2DEG(x) ((x)*180./M_PI)
+// #define OLAF_WIDTH 0.5  // 0.5 m?
+// #define FORWARD_VELOCITY 1  // 1 m/s?
 
 class MyClass {
 public:
@@ -26,24 +35,40 @@ public:
      *
      * @return input_string with an exclamation point added to it
      */
-     static std::string addCharacterToString(std::string input_string, std::string suffix);
-     std::string suffix;
+    //  static std::string addCharacterToString(std::string input_string, std::string suffix);
+    //  std::string suffix;
+
+    // main function
+    void goThoughCones();
+
 
 private:
+    ObstacleAvoider obstacleAvoider;
+
+    float _forward_vel = 0.01;  // in m/s
+    float _rate = 1;            // in s?
+
+    struct ObstacleAvoider::angleInfo _angle_info;
+
+    struct ObstacleAvoider::rangeInfo _range_info;
+
     /**
      * Callback function for when a new string is received
      *
      * @param msg the string received in the callback
      */
-    void subscriberCallBack(const std_msgs::String::ConstPtr& msg);
+    void laserScanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan);
+
     /**
      * Publishes a given string
      *
      * @param msg_to_publish the string to publish
      */
-    void republishMsg(std::string msg_to_publish);
+    // void republishMsg(std::string msg_to_publish);
 
     ros::Subscriber my_subscriber;
     ros::Publisher my_publisher;
+
+    std::vector<float> _ranges;
 };
 #endif //SAMPLE_PACKAGE_MYNODE_H
