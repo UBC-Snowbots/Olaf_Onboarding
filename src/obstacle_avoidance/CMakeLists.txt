@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(sample_package)
+project(obstacle_avoidance)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -103,7 +103,7 @@ add_definitions(-std=c++14)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
     INCLUDE_DIRS include
-#  LIBRARIES sample_package
+#  LIBRARIES obstacle_avoidance_package
 #  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
 )
@@ -122,26 +122,26 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(sample_package
-#   src/${PROJECT_NAME}/sample_package.cpp
+# add_library(obstacle_avoidance
+#   src/${PROJECT_NAME}/obstacle_avoidance.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(sample_package ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(obstacle_avoidance ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(sample_package_node src/sample_package_node.cpp)
+# add_executable(obstacle_avoidance_node src/obstacle_avoidance_node.cpp)
 add_executable(my_node src/my_node.cpp src/MyNode.cpp include/MyNode.h)
 
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(sample_package_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(obstacle_avoidance_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(sample_package_node
+# target_link_libraries(obstacle_avoidance_node
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(my_node ${catkin_LIBRARIES} ${sb_utils_LIBRARIES})
@@ -161,7 +161,7 @@ target_link_libraries(my_node ${catkin_LIBRARIES} ${sb_utils_LIBRARIES})
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS sample_package sample_package_node
+# install(TARGETS obstacle_avoidance obstacle_avoidance_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -199,7 +199,7 @@ if (CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
     # name the test and link it to the .test file and the .cpp file itself, this will allow
     # "catkin_make run_tests" to be able to find and run this rostest
-    add_rostest_gtest(my_node_rostest test/sample_package_test.test test/my_node_rostest.cpp)
+    add_rostest_gtest(my_node_rostest test/obstacle_avoidance_test.test test/my_node_rostest.cpp)
     target_link_libraries(my_node_rostest ${catkin_LIBRARIES})
 endif()
 
