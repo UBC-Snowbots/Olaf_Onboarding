@@ -15,9 +15,17 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
 
     // TODO: get parameters for width of robot, forward velocity, rate
 //     Obtains character from the parameter server (or launch file), sets '!' as default
-     std::string parameter_name = "my_node/character";
-     std::string default_character = "!";
-    SB_getParam(nh, parameter_name, suffix, default_character);
+     std::string forward_vel_param = "my_node/forward_vel";
+     float forward_vel_default = 0.01;
+    SB_getParam(nh, forward_vel_param, _forward_vel, forward_vel_default);
+    std::cout << "foward velocity: " << _forward_vel << std::endl;
+
+    std::string width_param = "my_node/width";
+    float width_default = 0.3;
+    float width;
+    SB_getParam(nh, width_param, width, width_default);
+    obstacleAvoider.setOlafWidth(width);
+    std::cout << "olaf width: " << width << std::endl;
 
     // Setup Subscriber(s)
     std::string topic_to_subscribe_to = "/scan";

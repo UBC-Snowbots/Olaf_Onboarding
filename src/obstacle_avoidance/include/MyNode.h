@@ -45,7 +45,7 @@ public:
 private:
     ObstacleAvoider obstacleAvoider;
 
-    float _forward_vel = 0.01;  // in m/s
+    float _forward_vel;  // in m/s
     float _rate = 1;            // in s?
 
     struct ObstacleAvoider::angleInfo _angle_info;

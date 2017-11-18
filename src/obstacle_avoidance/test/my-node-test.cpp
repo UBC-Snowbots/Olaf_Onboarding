@@ -139,6 +139,12 @@ TEST(ObstacleAvoider, TestGetAngularVelSelectOpening) {
     ranges = {5,FP_INFINITE,FP_INFINITE,FP_INFINITE,FP_INFINITE,FP_INFINITE,FP_INFINITE,FP_INFINITE,FP_INFINITE,5,5};
     avoider.update(angle_info, range_info, ranges);
     EXPECT_FLOAT_EQ(0.45,avoider.getAngularVel());
+
+    // Testing choosing maximum angle
+    ranges = {5,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,5,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,FP_NAN,5};
+    angle_info.angle_max = 2;
+    avoider.update(angle_info, range_info, ranges);
+    EXPECT_FLOAT_EQ(1.45,avoider.getAngularVel());
 }
 
 int main(int argc, char **argv) {

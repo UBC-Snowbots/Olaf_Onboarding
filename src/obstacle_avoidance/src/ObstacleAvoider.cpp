@@ -10,6 +10,11 @@ float ObstacleAvoider::getAngularVel() {
     //TODO: save value of previous tuple (dist1, angle1, x1) for next iteration
     // for( int i = 0; i < rangeArraySize-1; i++ ) {
     int i = 0;
+//    std::vector<output> possible_outputs;
+
+    float max_angle = 0.0;
+    float max_dist = 0.0;
+
     while( i < rangeArraySize ) {
         float dist1 = _ranges[i];
 
@@ -45,12 +50,16 @@ float ObstacleAvoider::getAngularVel() {
         // found opening!
         if( getDistBetweenObstacles(obstacle1,obstacle2) >= _olaf_width  ) {
             // return the middle angle between two angles
-            return (angle1+angle2)/2;
+            if( getDistBetweenObstacles(obstacle1,obstacle2) > max_dist ) {
+                max_angle = (angle1 + angle2) / 2;
+                max_dist = getDistBetweenObstacles(obstacle1, obstacle2);
+            }
+//            return (angle1+angle2)/2;
         }
 
         i++;
     }
-    return 0.0;
+    return max_angle;
 }
 
 float ObstacleAvoider::getDistBetweenObstacles(obstacle o1, obstacle o2) {

@@ -43,6 +43,10 @@ public:
         return _angle_info.angle_min + index * _angle_info.angle_increment;
     }
 
+    void setOlafWidth(float width) {
+        _olaf_width = width;
+    }
+
     static float getX(float distance, float angle) {
         return distance * cos(angle);
     }
@@ -56,7 +60,7 @@ public:
     static float getYBetweenObstacles(obstacle o1, obstacle o2);
 
 private:
-    float _olaf_width = 0.5;    // in m
+    float _olaf_width=0.5;    // in m
     std::vector<float> _ranges;
 
     struct angleInfo _angle_info;
