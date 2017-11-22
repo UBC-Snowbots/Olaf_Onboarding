@@ -8,6 +8,6 @@
 	<rosparam param="theta_scaling_multiplier">1.0</rosparam>
 	<rosparam param="max_distance_from_goal">1.0</rosparam>
 	<rosparam param="cone_grouping_tolerance">0.2</rosparam>
-	<rosparam param="max_scan_distance">1.0</rosparam>
+	<rosparam param="max_scan_distance">0.1</rosparam>
     </node>
 </launch>

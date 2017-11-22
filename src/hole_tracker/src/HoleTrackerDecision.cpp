@@ -4,11 +4,11 @@
  * Description: Determines the twist message that aims for the hole
  *
  */
-#include <LidarDecision.h>
+#include <HoleTrackerDecision.h>
 
 using namespace std;
 
-LidarDecision::LidarDecision(double angular_vel_cap, double linear_vel_cap, double angular_vel_multiplier,
+HoleTrackerDecision::HoleTrackerDecision(double angular_vel_cap, double linear_vel_cap, double angular_vel_multiplier,
                              double linear_vel_multiplier, double theta_scaling_multiplier, double max_distance_from_goal):
     angular_vel_cap(angular_vel_cap),
     linear_vel_cap(linear_vel_cap),
@@ -22,13 +22,13 @@ LidarDecision::LidarDecision(double angular_vel_cap, double linear_vel_cap, doub
     origin.y = 0;
 }
 
-LidarDecision::LidarDecision() {
+HoleTrackerDecision::HoleTrackerDecision() {
     // Setup origin point
     origin.x = 0;
     origin.y = 0;
 }
 
-geometry_msgs::Twist LidarDecision::determineDesiredMotion(vector<vector<geometry_msgs::Point>> merged_points,
+geometry_msgs::Twist HoleTrackerDecision::determineDesiredMotion(vector<vector<geometry_msgs::Point>> merged_points,
                                                            geometry_msgs::Point hole) {
     geometry_msgs::Twist move_to_hole;
     geometry_msgs::Twist avoid_cones;
@@ -46,8 +46,12 @@ geometry_msgs::Twist LidarDecision::determineDesiredMotion(vector<vector<geometr
     return move_to_hole;
 }
 
-double LidarDecision::determineTurningVel(double theta, double distance) {
-    // TODO: Make turning speed dependant on distance to the hole
+double HoleTrackerDecision::determineTurningVel(double theta, double distance) {
+    // Should stop if goal has been reached
+    if (distance < max_distance_from_goal)
+        return 0;
+
+    // Should turn faster if necessary turn is larger.
     double angular_vel = theta * theta_scaling_multiplier * angular_vel_multiplier;
 
     // Limit angular velocity
@@ -57,19 +61,23 @@ double LidarDecision::determineTurningVel(double theta, double distance) {
     return angular_vel;
 }
 
-double LidarDecision::determineMovingVel(double theta, double distance) {
+double HoleTrackerDecision::determineMovingVel(double theta, double distance) {
+    // Should stop if goal has been reached
     if (distance < max_distance_from_goal) return 0;
 
+    // Should go faster if further from hole. Should go slower if necessary turn is larger.
     double linear_vel = (distance * linear_vel_multiplier) / (theta * theta_scaling_multiplier);
 
     // Limit linear velocity
     if (fabs(linear_vel) > linear_vel_cap)
-        linear_vel = linear_vel_cap * fabs(linear_vel) / linear_vel;
+        linear_vel = linear_vel_cap;
 
-    return linear_vel;
+    // Should only go forwards
+    return fabs(linear_vel);
 }
 
-void LidarDecision::initTwist(geometry_msgs::Twist &twist) {
+void HoleTrackerDecision::initTwist(geometry_msgs::Twist &twist) {
+    // Don't care about these values so set them to 0.
     twist.linear.y = 0;
     twist.linear.z = 0;
     twist.angular.x = 0;

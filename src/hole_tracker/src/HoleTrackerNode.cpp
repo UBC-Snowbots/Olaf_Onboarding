@@ -17,18 +17,20 @@ HoleTrackerNode::HoleTrackerNode(int argc, char **argv, std::string node_name) {
     initSubscribers(nh);
     initPublishers(nh);
 
-    lidar_decision = LidarDecision(angular_vel_cap, linear_vel_cap, angular_vel_multiplier, linear_vel_multiplier,
-                                   theta_scaling_multiplier, max_distance_from_goal);
+    hole_tracker_decision = HoleTrackerDecision(angular_vel_cap, linear_vel_cap, angular_vel_multiplier,
+                                                linear_vel_multiplier,
+                                                theta_scaling_multiplier, max_distance_from_goal);
+    obstacle_manager = LidarObstacleManager(max_scan_distance, cone_grouping_tolerance);
 
 }
 
 void HoleTrackerNode::laserScanCallBack(const sensor_msgs::LaserScan laser_scan) {
     // Setup Obstacle Manager
-    LidarObstacleManager obstacle_manager = LidarObstacleManager(laser_scan, max_scan_distance, cone_grouping_tolerance);
+    obstacle_manager.parseLaserScan(laser_scan);
 
-    vector<vector<geometry_msgs::Point>> merged_points = obstacle_manager.getMergedPoints();
+    vector<vector<geometry_msgs::Point>> merged_points = obstacle_manager.getMergedObstacles();
 
-    // Find the hole.cd
+    // Find the hole
     geometry_msgs::Point hole = obstacle_manager.getHole();
 
     // Publish RViz markers
@@ -44,7 +46,7 @@ void HoleTrackerNode::laserScanCallBack(const sensor_msgs::LaserScan laser_scan)
     cone2_debug_publisher.publish(RvizUtils().displayPoints(merged_points[1], green, scale, frame_id, ns));
     hole_debug_publisher.publish(RvizUtils().displayPoint(hole, red, scale, frame_id, ns));
 
-    geometry_msgs::Twist follow_hole = lidar_decision.determineDesiredMotion(merged_points, hole);
+    geometry_msgs::Twist follow_hole = hole_tracker_decision.determineDesiredMotion(merged_points, hole);
     publishTwist(follow_hole);
 }
 
@@ -69,7 +71,8 @@ void HoleTrackerNode::initObstacleManagerParams(ros::NodeHandle private_nh) {
 void HoleTrackerNode::initSubscribers(ros::NodeHandle nh) {
     std::string topic_to_subscribe_to = "/scan";
     uint32_t refresh_rate = 10;
-    laser_scan_subscriber = nh.subscribe(topic_to_subscribe_to, refresh_rate, &HoleTrackerNode::laserScanCallBack, this);
+    laser_scan_subscriber = nh.subscribe(topic_to_subscribe_to, refresh_rate, &HoleTrackerNode::laserScanCallBack,
+                                         this);
 }
 
 void HoleTrackerNode::initPublishers(ros::NodeHandle private_nh) {

@@ -13,60 +13,97 @@
 // Utilities
 #include <LinearAlgebra.h>
 
-using namespace std;
-
 class LidarObstacleManager {
 public:
-    LidarObstacleManager(sensor_msgs::LaserScan, double max_scan_distance, double cone_grouping_tolerance);
+    // Required empty constructor.
+    LidarObstacleManager();
 
-    // Getter functions
-    vector<geometry_msgs::Point> getPoints();
-    vector<vector<geometry_msgs::Point>> getMergedPoints();
+    /**
+     *  Sets up the obstacle manager.
+     */
+    LidarObstacleManager(double max_scan_distance, double cone_grouping_tolerance);
+
+    /**
+     *  Takes in a laser scan and initialises this LidarObstacleManager's obstacles, merged obstacles, and hole.
+     *
+     *  @param laser_scan
+     */
+    void parseLaserScan(sensor_msgs::LaserScan laser_scan);
+
+    /**
+     *  Returns all the obstacles inside the laser scan.
+     *
+     *  @return obstacles
+     */
+    std::vector<geometry_msgs::Point> getObstacles();
+
+    /**
+     *  Return groups of obstacles that were grouped together based on proximity.
+     *
+     *  @return obstacle groups
+     */
+    std::vector<std::vector<geometry_msgs::Point>> getMergedObstacles();
+
+    /**
+     *  Return where the hole in the wall is.
+     *
+     *  @return hole in the wall
+     */
     geometry_msgs::Point getHole();
 
 private:
     /**
-     * Construct a vector of valid obstacles given a laser scan
+     *  Construct a std::vector of valid obstacles given a laser scan
      *
-     * @param laser_scan the laser scan to be parsed
-     * @returns a vector of valid obstacles
+     *  @param laser_scan the laser scan to be parsed
+     *  @return a std::vector of valid obstacles
      */
-    vector<geometry_msgs::Point> constructPoints(sensor_msgs::LaserScan laser_scan);
+    std::vector<geometry_msgs::Point> constructObstacles(sensor_msgs::LaserScan laser_scan);
 
     /**
-     * Check if a point is valid
+     *  Check if a obstacle is valid
      *
-     * @param point the point to be checked
-     * @returns point validity
+     *  @param obstacle the obstacle to be checked
+     *  @param range_max the furthest the obstacle can be to be considered valid
+     *  @param range_min the closest the obstacle has to be to be considered valid
+     *  @return obstacle validity
      */
-    bool validatePoint(float range, float range_max, float range_min);
+    bool validateObstacle(float range, float range_max, float range_min);
 
     /**
-     * Convert polar point to cartesian point
+     *  Convert polar point to cartesian point
      *
-     * @returns the cartesian point
+     *  @param range the distance from origin
+     *  @param theta the angle to x-axis
+     *
+     *  @return the cartesian point
      */
     geometry_msgs::Point polarToCartesian(float range, float theta);
 
     /**
-     * Group points based on proximity
+     *  Group obstacles based on proximity
      *
-     * @returns a vector of grouped points
+     *  @param obstacles the obstacles to be merged
+     *
+     *  @return obstacle groups
      */
-    vector<vector<geometry_msgs::Point>> mergePoints(vector<geometry_msgs::Point> points);
+    std::vector<std::vector<geometry_msgs::Point>> mergeObstacles(std::vector<geometry_msgs::Point> obstacles);
 
     /**
-     * Groups the point into currently existing merged points
-     *
-     * @returns whether or not it grouped the point
+     *  Groups the obstacle into currently existing merged obstacles
+     *  
+     *  @param merged_obstacles the currently existing merged obstacles
+     *  @param obstacle the obstacle to be merged in
+     *  
+     *  @returns whether or not it grouped the obstacle
      */
-    bool findMatch(vector<vector<geometry_msgs::Point>> &merged_points, geometry_msgs::Point point);
+    bool findMatch(std::vector<std::vector<geometry_msgs::Point>> &merged_obstacles, geometry_msgs::Point obstacle);
 
     // Obstacles
-    vector<geometry_msgs::Point> points;
-    vector<vector<geometry_msgs::Point>> merged_points;
+    std::vector<geometry_msgs::Point> obstacles;
+    std::vector<std::vector<geometry_msgs::Point>> merged_obstacles;
 
-    // The hole in the obstacles
+    // The hole in the wall
     geometry_msgs::Point hole;
 
     // Obstacle Manager parameters

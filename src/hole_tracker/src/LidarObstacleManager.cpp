@@ -1,69 +1,76 @@
 /*
  * Created By: Robyn Castro
  * Created On: November 10th, 2017
- * Description: Manages obstacles by taking in a set of data points.
+ * Description: Takes in a laser scan, and manages
  * 
  */
 #include <LidarObstacleManager.h>
+#include <ros/ros.h>
 
-LidarObstacleManager::LidarObstacleManager(sensor_msgs::LaserScan laser_scan, double max_scan_distance,
-                                           double cone_grouping_tolerance) :
+using namespace geometry_msgs;
+
+LidarObstacleManager::LidarObstacleManager(double max_scan_distance, double cone_grouping_tolerance) :
         max_scan_distance(max_scan_distance),
-        cone_grouping_tolerance(cone_grouping_tolerance) {
+        cone_grouping_tolerance(cone_grouping_tolerance) { }
 
-    points = constructPoints(laser_scan);
-    merged_points = mergePoints(points);
-    pair<geometry_msgs::Point, geometry_msgs::Point> closest_pair = LinearAlgebra().getClosestPair(merged_points[0],
-                                                                                                   merged_points[1]);
+void LidarObstacleManager::parseLaserScan(sensor_msgs::LaserScan laser_scan) {
+    obstacles = constructObstacles(laser_scan);
+    merged_obstacles = mergeObstacles(obstacles);
+    pair<Point, Point> closest_pair = LinearAlgebra().getClosestPair(merged_obstacles[0], merged_obstacles[1]);
+
     hole = LinearAlgebra().getMiddlePoint(closest_pair.first, closest_pair.second);
 }
 
-vector<geometry_msgs::Point> LidarObstacleManager::constructPoints(sensor_msgs::LaserScan laser_scan) {
-    vector<geometry_msgs::Point> points;
+vector<Point> LidarObstacleManager::constructObstacles(sensor_msgs::LaserScan laser_scan) {
+    vector<Point> obstacles;
     int i = 0;
+    float range_max = laser_scan.range_max;
+    if (range_max > max_scan_distance)
+        range_max = (float) max_scan_distance;
     for (float angle = laser_scan.angle_min; angle < laser_scan.angle_max; angle += laser_scan.angle_increment) {
-        if (validatePoint(laser_scan.ranges[i], laser_scan.range_min, laser_scan.range_max)) {
-            points.push_back(polarToCartesian(laser_scan.ranges[i], angle));
+        if (validateObstacle(laser_scan.ranges[i], laser_scan.range_min, range_max)) {
+            obstacles.push_back(polarToCartesian(laser_scan.ranges[i], angle));
         }
         i++;
     }
-    return points;
+    return obstacles;
 }
 
-bool LidarObstacleManager::validatePoint(float range, float range_min, float range_max) {
+bool LidarObstacleManager::validateObstacle(float range, float range_min, float range_max) {
     bool in_range = range > range_min && range < range_max;
     return !isnan(range) && in_range;
 
 }
 
 // Sort the vectors based on size
-bool sortMerges(vector<geometry_msgs::Point> a, vector<geometry_msgs::Point> b) {
+bool sortMerges(vector<Point> a, vector<Point> b) {
     return a.size() > b.size();
 }
 
-vector<vector<geometry_msgs::Point>> LidarObstacleManager::mergePoints(vector<geometry_msgs::Point> points) {
-    vector<vector<geometry_msgs::Point>> merged_points;
-    for (int i = 0; i < points.size(); i++) {
-        bool found_match = findMatch(merged_points, points[i]);
+vector<vector<Point>> LidarObstacleManager::mergeObstacles(vector<Point> obstacles) {
+    vector<vector<Point>> merged_obstacles;
+    for (int i = 0; i < obstacles.size(); i++) {
+        bool found_match = findMatch(merged_obstacles, obstacles[i]);
 
         // If didn't find a match start a new merge list.
         if (!found_match) {
-            vector<geometry_msgs::Point> new_merge;
-            new_merge.push_back(points[i]);
-            merged_points.push_back(new_merge);
+            vector<Point> new_merge;
+            new_merge.push_back(obstacles[i]);
+            merged_obstacles.push_back(new_merge);
         }
     }
     // First two vectors should now correspond to left wall and right wall
-    sort(merged_points.begin(), merged_points.end(), sortMerges);
+    sort(merged_obstacles.begin(), merged_obstacles.end(), sortMerges);
 
-    return merged_points;
+    return merged_obstacles;
 }
 
-bool LidarObstacleManager::findMatch(vector<vector<geometry_msgs::Point>> &merged_points, geometry_msgs::Point point) {
-    for (int j = 0; j < merged_points.size(); j++) {
-        for (int k = 0; k < merged_points[j].size(); k++) {
-            if (LinearAlgebra().distanceBetweenPoints(merged_points[j][k], point) < cone_grouping_tolerance) {
-                merged_points[j].push_back(point);
+bool LidarObstacleManager::findMatch(vector<vector<Point>> &merged_obstacles,
+                                     Point point) {
+    for (int j = 0; j < merged_obstacles.size(); j++) {
+        for (int k = 0; k < merged_obstacles[j].size(); k++) {
+            if (LinearAlgebra().distanceBetweenPoints(merged_obstacles[j][k], point) < cone_grouping_tolerance) {
+                merged_obstacles[j].push_back(point);
                 return true;
             }
         }
@@ -71,8 +78,8 @@ bool LidarObstacleManager::findMatch(vector<vector<geometry_msgs::Point>> &merge
     return false;
 }
 
-geometry_msgs::Point LidarObstacleManager::polarToCartesian(float range, float theta) {
-    geometry_msgs::Point cartesian_point;
+Point LidarObstacleManager::polarToCartesian(float range, float theta) {
+    Point cartesian_point;
 
     cartesian_point.x = range * cos(theta);
     cartesian_point.y = range * sin(theta);
@@ -80,14 +87,14 @@ geometry_msgs::Point LidarObstacleManager::polarToCartesian(float range, float t
     return cartesian_point;
 }
 
-vector<geometry_msgs::Point> LidarObstacleManager::getPoints() {
-    return points;
+vector<Point> LidarObstacleManager::getObstacles() {
+    return obstacles;
 }
 
-vector<vector<geometry_msgs::Point>> LidarObstacleManager::getMergedPoints() {
-    return merged_points;
+vector<vector<Point>> LidarObstacleManager::getMergedObstacles() {
+    return merged_obstacles;
 }
 
-geometry_msgs::Point LidarObstacleManager::getHole() {
+Point LidarObstacleManager::getHole() {
     return hole;
 }

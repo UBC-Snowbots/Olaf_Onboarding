@@ -11,7 +11,7 @@
 #include <visualization_msgs/Marker.h>
 
 // Lidar Specific
-#include <LidarDecision.h>
+#include <HoleTrackerDecision.h>
 
 // ROS
 #include <ros/ros.h>
@@ -26,42 +26,46 @@ public:
     HoleTrackerNode(int argc, char **argv, string node_name);
 private:
     /**
-     * Callback function for when a new laser scan is received
+     *  Callback function for when a new laser scan is received.
      *
-     * @param laser_scan the laser scan received in the callback
+     *  @param laser_scan the laser scan received in the callback
      */
     void laserScanCallBack(const sensor_msgs::LaserScan laser_scan);
 
     /**
-     * Publishes the twist
+     *  Publishes the twist.
      *
-     * @param msg_to_publish the string to publish
+     *  @param msg_to_publish the string to publish
      */
     void publishTwist(geometry_msgs::Twist twist_msg);
 
     /**
-     * Setup the decision parameters
+     *  Setup the decision parameters.
      *
-     * @param private_nh the private node handle
+     *  @param private_nh the private node handle
      */
     void initDecisionParams(ros::NodeHandle private_nh);
 
     /**
-     * Setup the obstacle manager parameters
+     *  Setup the obstacle manager parameters.
      *
-     * @param private_nh the private node handle
+     *  @param private_nh the private node handle
      */
     void initObstacleManagerParams(ros::NodeHandle private_nh);
 
     /**
-     * Setup the subscribers
+     *  Setup the subscribers.
+     *
+     *  @param nh the node handle
      */
     void initSubscribers(ros::NodeHandle nh);
 
     /**
-     * Setup the publishers
+     *  Setup the publishers.
+     *
+     *  @param nh the node handle
      */
-    void initPublishers(ros::NodeHandle private_nh);
+    void initPublishers(ros::NodeHandle nh);
 
     // Decision parameters
     double angular_vel_cap;
@@ -87,7 +91,8 @@ private:
     ros::Publisher hole_debug_publisher;
 
     // Controller
-    LidarDecision lidar_decision;
+    HoleTrackerDecision hole_tracker_decision;
+    LidarObstacleManager obstacle_manager;
 
 };
 

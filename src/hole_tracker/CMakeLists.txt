@@ -24,12 +24,12 @@ include_directories(
 add_executable(hole_tracker_node
         src/hole_tracker_node.cpp
         src/HoleTrackerNode.cpp
-        src/LidarDecision.cpp
+        src/HoleTrackerDecision.cpp
         src/LidarObstacleManager.cpp
         src/LinearAlgebra.cpp
         src/RvizUtils.cpp
         include/HoleTrackerNode.h
-        include/LidarDecision.h
+        include/HoleTrackerDecision.h
         include/LidarObstacleManager.h
         include/LinearAlgebra.h
         include/RvizUtils.h
@@ -51,7 +51,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(lidar-obstacle-manager-test ${catkin_LIBRARIES})
 
 
-    catkin_add_gtest(lidar-decision-test test/lidar-decision-test.cpp src/LidarDecision.cpp src/LinearAlgebra.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+    catkin_add_gtest(lidar-decision-test test/lidar-decision-test.cpp src/HoleTrackerDecision.cpp src/LinearAlgebra.cpp WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
     target_link_libraries(lidar-decision-test ${catkin_LIBRARIES})
 endif ()
 
