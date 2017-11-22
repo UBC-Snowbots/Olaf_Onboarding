@@ -1,0 +1,13 @@
+<launch>
+    <!-- Launch lidar decision-->
+    <node name="hole_tracker_node" pkg="hole_tracker" type="hole_tracker_node" output="screen">
+        <rosparam param="angular_vel_cap">1.0</rosparam>
+    	<rosparam param="linear_vel_cap">1.0</rosparam>
+	<rosparam param="angular_vel_multiplier">1.0</rosparam>
+	<rosparam param="linear_vel_multiplier">1.0</rosparam>
+	<rosparam param="theta_scaling_multiplier">1.0</rosparam>
+	<rosparam param="max_distance_from_goal">1.0</rosparam>
+	<rosparam param="cone_grouping_tolerance">0.2</rosparam>
+	<rosparam param="max_scan_distance">0.1</rosparam>
+    </node>
+</launch>
