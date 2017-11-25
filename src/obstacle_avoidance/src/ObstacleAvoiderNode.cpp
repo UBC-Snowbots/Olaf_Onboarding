@@ -6,7 +6,7 @@
  *              a "!" at the end
  */
 
-#include <MyNode.h>
+#include <ObstacleAvoiderNode.h>
 
 MyClass::MyClass(int argc, char **argv, std::string node_name) {
     // Setup NodeHandles
@@ -14,7 +14,6 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     ros::NodeHandle nh;
 
     // TODO: get parameters for width of robot, forward velocity, rate
-//     Obtains character from the parameter server (or launch file), sets '!' as default
      std::string forward_vel_param = "my_node/forward_vel";
      float forward_vel_default = 0.01;
     SB_getParam(nh, forward_vel_param, _forward_vel, forward_vel_default);
@@ -36,14 +35,9 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     std::string topic_to_publish_to = "/cmd_vel";
     uint32_t queue_size = 1;
     my_publisher = nh.advertise<geometry_msgs::Twist>(topic_to_publish_to, queue_size);
-
-//    goThoughCones();
 }
 
 void MyClass::goThoughCones() {
-//  ros::Rate rate(_rate);
-
-//  while(ros::ok()){
     geometry_msgs::Twist msg;
     msg.linear.x = _forward_vel;
 
@@ -52,10 +46,6 @@ void MyClass::goThoughCones() {
     std::cout << "angular z is " << msg.angular.z << std::endl;
     my_publisher.publish(msg);
     ROS_INFO("Published message");
-
-//      rate.sleep();
-//      ros::spinOnce();      //Notice this
-//  }
 }
 
 

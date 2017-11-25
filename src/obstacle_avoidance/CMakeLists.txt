@@ -133,7 +133,7 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(sample_package_node src/sample_package_node.cpp)
-add_executable(my_node src/my_node.cpp src/MyNode.cpp include/MyNode.h src/ObstacleAvoider.cpp include/ObstacleAvoider.h)
+add_executable(my_node src/obstacle_avoider_node.cpp src/ObstacleAvoiderNode.cpp include/ObstacleAvoiderNode.h src/ObstacleAvoider.cpp include/ObstacleAvoider.h)
 
 
 ## Add cmake target dependencies of the executable
@@ -192,14 +192,14 @@ target_link_libraries(my_node ${catkin_LIBRARIES} ${sb_utils_LIBRARIES})
 if (CATKIN_ENABLE_TESTING)
 
     # Adding gtests to the package
-    catkin_add_gtest(my-node-test test/my-node-test.cpp src/MyNode.cpp src/ObstacleAvoider.cpp)
+    catkin_add_gtest(my-node-test test/obstacle-avoider-node-test.cpp src/ObstacleAvoiderNode.cpp src/ObstacleAvoider.cpp)
     target_link_libraries(my-node-test ${catkin_LIBRARIES})
 
     # Adding rostest to the package
     find_package(rostest REQUIRED)
     # name the test and link it to the .test file and the .cpp file itself, this will allow
     # "catkin_make run_tests" to be able to find and run this rostest
-    add_rostest_gtest(my_node_rostest test/sample_package_test.test test/my_node_rostest.cpp)
+    add_rostest_gtest(my_node_rostest test/sample_package_test.test test/obstacle_avoider_rostest.cpp)
     target_link_libraries(my_node_rostest ${catkin_LIBRARIES})
 endif()
 

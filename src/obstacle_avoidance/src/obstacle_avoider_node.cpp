@@ -6,7 +6,7 @@
  *              a "!" at the end
  */
 
-#include <MyNode.h>
+#include <ObstacleAvoiderNode.h>
 
 int main(int argc, char **argv){
     // Setup your ROS node

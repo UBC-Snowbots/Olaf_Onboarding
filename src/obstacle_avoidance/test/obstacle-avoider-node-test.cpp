@@ -1,7 +1,7 @@
 /*
- * Created By: Gareth Ellis
- * Created On: July 16th, 2016
- * Description: Tests for MyNode
+ * Created By: Min Gyo Kim
+ * Created On: November 25, 2017
+ * Description: Tests for ObstacleAvoiderNode
  */
 
 #include <gtest/gtest.h>
