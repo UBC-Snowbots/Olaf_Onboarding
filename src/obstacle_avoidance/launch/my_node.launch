@@ -1,5 +1,4 @@
 <launch>
     <node name="obs_avoid_node" pkg="obstacle_avoidance" type="obs_avoid_node" output="screen">
-        <param name="character" value="?" />
     </node>
 </launch>

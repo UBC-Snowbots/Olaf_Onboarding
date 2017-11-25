@@ -5,7 +5,7 @@
  *              and help Olaf navigate through a hole in a row of cones
  *              Stress on *theoretically*
  */
-#include <MyNode.h>
+#include <ObstacleAvoidance.h>
 
 
 int main(int argc, char **argv){
@@ -13,7 +13,7 @@ int main(int argc, char **argv){
     std::string node_name = "my_node";
 
     // Create an instance of your class
-    MyClass my_class(argc, argv, node_name);
+    ObstacleAvoidanceNode my_class(argc, argv, node_name);
 
     // Start up ros. This will continue to run until the node is killed
     ros::spin();

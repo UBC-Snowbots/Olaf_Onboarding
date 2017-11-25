@@ -134,7 +134,7 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(obstacle_avoidance_node src/obstacle_avoidance_node.cpp)
-add_executable(obs_avoid_node src/my_node.cpp src/MyNode-devel.cpp include/MyNode.h)
+add_executable(obs_avoid_node src/my_node.cpp src/ObstacleAvoidanceNode.cpp include/ObstacleAvoidance.h)
 
 
 ## Add cmake target dependencies of the executable
@@ -193,15 +193,10 @@ target_link_libraries(obs_avoid_node ${catkin_LIBRARIES} ${sb_utils_LIBRARIES})
 if (CATKIN_ENABLE_TESTING)
 
     # Adding gtests to the package
-    catkin_add_gtest(obs-avoid-node-test test/my-node-test.cpp src/MyNode-devel.cpp)
+    catkin_add_gtest(obs-avoid-node-test test/my-node-test.cpp src/ObstacleAvoidanceNode.cpp)
     target_link_libraries(obs-avoid-node-test ${catkin_LIBRARIES})
 
-    # Adding rostest to the package
-    find_package(rostest REQUIRED)
-    # name the test and link it to the .test file and the .cpp file itself, this will allow
-    # "catkin_make run_tests" to be able to find and run this rostest
-    #add_rostest_gtest(obs_avoid_node_rostest test/obstacle_avoidance_test.test test/my_node_rostest.cpp)
-    #target_link_libraries(my_node_rostest ${catkin_LIBRARIES})
+
 endif()
 
 ## Add folders to be run by python nosetests
