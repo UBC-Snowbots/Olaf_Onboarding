@@ -1,11 +1,10 @@
 /*
- * Created By: Valerian Ratu
- * Created On: January 29, 2017
- * Description: Integration testing for MyNode
+ * Created By: Min Gyo Kim
+ * Created On: November 25, 2017
+ * Description: Ros tests for ObstacleAvoiderNode
  */
 
 
-//#include <MyNode.h>
 #include <gtest/gtest.h>
 #include <ObstacleAvoider.h>
 #include <ros/ros.h>
@@ -21,11 +20,11 @@
  *      callback function - the callback function which corresponds to the subscriber
  *      getter function - to provide a way for gtest to check for equality of the message recieved
  */
-class MyNodeTest : public testing::Test{
+class ObstacleAvoiderTest : public testing::Test{
 protected:
     virtual void SetUp(){
         test_publisher = nh_.advertise<sensor_msgs::LaserScan>("/scan", 1);
-        test_subscriber = nh_.subscribe("/cmd_vel", 1, &MyNodeTest::callback, this);
+        test_subscriber = nh_.subscribe("/cmd_vel", 1, &ObstacleAvoiderTest::callback, this);
 
         // Let the publishers and subscribers set itself up timely
         ros::Rate loop_rate(1);
@@ -33,7 +32,6 @@ protected:
     }
 
     ros::NodeHandle nh_;
-//    std::string message_output;
     float message_output;
     ros::Publisher test_publisher;
     ros::Subscriber test_subscriber;
@@ -45,11 +43,7 @@ public:
     }
 };
 
-TEST_F(MyNodeTest, getAngularVel){
-
-    // publishes "Hello" to the test node
-//    st    d_msgs::String msg;
-//    msg.data = "Hello";
+TEST_F(ObstacleAvoiderTest, getAngularVel){
     sensor_msgs::LaserScan scan;
 
     scan.angle_min = 0;
@@ -70,8 +64,6 @@ TEST_F(MyNodeTest, getAngularVel){
     // Wait for the message to get passed around
     loop_rate.sleep();
 
-
-
     // spinOnce allows ros to actually process your callbacks
     // for the curious: http://answers.ros.org/question/11887/significance-of-rosspinonce/
     ros::spinOnce();
@@ -84,7 +76,7 @@ TEST_F(MyNodeTest, getAngularVel){
 
 int main(int argc, char **argv) {
     // !! Don't forget to initialize ROS, since this is a test within the ros framework !!
-    ros::init(argc, argv, "my_node_rostest");
+    ros::init(argc, argv, "obstacle_avoider_node_rostest");
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

@@ -1,5 +1,5 @@
 <launch>
-    <node name="my_node" pkg="obstacle_avoidance" type="my_node" output="screen">
+    <node name="obstacle_avoider_node" pkg="obstacle_avoidance" type="obstacle_avoider_node" output="screen">
         <param name="forward_vel" value="2" />
         <param name="width" value="0.4" />
     </node>

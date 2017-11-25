@@ -1,25 +1,23 @@
 /*
- * Created By: Gareth Ellis
- * Created On: July 16th, 2016
- * Description: An example node that subscribes to a topic publishing strings,
- *              and re-publishes everything it receives to another topic with
- *              a "!" at the end
+ * Created By: Min Gyo Kim
+ * Created On: November 25, 2017
+ * Description: ObstacleAvoiderNode - Node that outputs twist message based on obstacles
  */
 
 #include <ObstacleAvoiderNode.h>
 
-MyClass::MyClass(int argc, char **argv, std::string node_name) {
+ObstacleAvoiderNode::ObstacleAvoiderNode(int argc, char **argv, std::string node_name) {
     // Setup NodeHandles
     ros::init(argc, argv, node_name);
     ros::NodeHandle nh;
 
     // TODO: get parameters for width of robot, forward velocity, rate
-     std::string forward_vel_param = "my_node/forward_vel";
+     std::string forward_vel_param = "obstacle_avoider_node/forward_vel";
      float forward_vel_default = 0.01;
     SB_getParam(nh, forward_vel_param, _forward_vel, forward_vel_default);
     std::cout << "foward velocity: " << _forward_vel << std::endl;
 
-    std::string width_param = "my_node/width";
+    std::string width_param = "obstacle_avoider_node/width";
     float width_default = 0.3;
     float width;
     SB_getParam(nh, width_param, width, width_default);
@@ -29,7 +27,7 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     // Setup Subscriber(s)
     std::string topic_to_subscribe_to = "/scan";
     int refresh_rate = 10;
-    my_subscriber = nh.subscribe(topic_to_subscribe_to, refresh_rate, &MyClass::laserScanCallBack, this);
+    my_subscriber = nh.subscribe(topic_to_subscribe_to, refresh_rate, &ObstacleAvoiderNode::laserScanCallBack, this);
 
     // Setup Publisher(s)
     std::string topic_to_publish_to = "/cmd_vel";
@@ -37,7 +35,7 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     my_publisher = nh.advertise<geometry_msgs::Twist>(topic_to_publish_to, queue_size);
 }
 
-void MyClass::goThoughCones() {
+void ObstacleAvoiderNode::goThoughCones() {
     geometry_msgs::Twist msg;
     msg.linear.x = _forward_vel;
 
@@ -49,7 +47,7 @@ void MyClass::goThoughCones() {
 }
 
 
-void MyClass::laserScanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan) {
+void ObstacleAvoiderNode::laserScanCallBack(const sensor_msgs::LaserScan::ConstPtr& scan) {
     ROS_INFO("Received message");
 
     _ranges = scan->ranges;

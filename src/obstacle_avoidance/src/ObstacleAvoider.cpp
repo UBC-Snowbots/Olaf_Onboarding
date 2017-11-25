@@ -1,6 +1,9 @@
-//
-// Created by min on 21/10/17.
-//
+/*
+ * Created By: Min Gyo Kim
+ * Created On: November 25, 2017
+ * Description: Implementation of calculating z-angular value based on obstacles
+ */
+
 #include <ObstacleAvoider.h>
 
 float ObstacleAvoider::getAngularVel() {

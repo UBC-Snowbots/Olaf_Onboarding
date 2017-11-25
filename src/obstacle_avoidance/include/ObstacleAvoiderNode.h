@@ -1,13 +1,11 @@
 /*
- * Created By: Gareth Ellis
- * Created On: July 16th, 2016
- * Description: An example node that subscribes to a topic publishing strings,
- *              and re-publishes everything it receives to another topic with
- *              a "!" at the end
+ * Created By: Min Gyo Kim
+ * Created On: November 25, 2017
+ * Description: Header file for ObstacleAvoiderNode
  */
 
-#ifndef SAMPLE_PACKAGE_MYNODE_H
-#define SAMPLE_PACKAGE_MYNODE_H
+#ifndef OBSTACLE_AVOIDER_NODE_H
+#define OBSTACLE_AVOIDER_NODE_H
 
 #include <iostream>
 #include <std_msgs/String.h>
@@ -19,13 +17,9 @@
 #include <ObstacleAvoider.h>
 #include <string>
 
-#define RAD2DEG(x) ((x)*180./M_PI)
-// #define OLAF_WIDTH 0.5  // 0.5 m?
-// #define FORWARD_VELOCITY 1  // 1 m/s?
-
-class MyClass {
+class ObstacleAvoiderNode {
 public:
-    MyClass(int argc, char **argv, std::string node_name);
+    ObstacleAvoiderNode(int argc, char **argv, std::string node_name);
 
     // main function
     void goThoughCones();
@@ -52,4 +46,4 @@ private:
 
     std::vector<float> _ranges;
 };
-#endif //SAMPLE_PACKAGE_MYNODE_H
+#endif //OBSTACLE_AVOIDER_NODE_H
