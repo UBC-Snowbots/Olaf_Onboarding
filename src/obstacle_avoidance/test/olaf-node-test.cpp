@@ -1,15 +1,15 @@
 /*
  * Created By: Gareth Ellis
  * Created On: July 16th, 2016
- * Description: Tests for MyNode
+ * Description: Tests for OlafNode
  */
 
-#include <MyNode.h>
+#include <OlafNode.h>
 #include <gtest/gtest.h>
 
 TEST(MyNode, addExclamationPoint){
-    EXPECT_EQ("!", MyClass::addCharacterToString("", "!"));
-    EXPECT_EQ("Hello!", MyClass::addCharacterToString("Hello", "!"));
+    EXPECT_EQ("!", OlafClass::addCharacterToString("", "!"));
+    EXPECT_EQ("Hello!", OlafClass::addCharacterToString("Hello", "!"));
 }
 
 int main(int argc, char **argv) {

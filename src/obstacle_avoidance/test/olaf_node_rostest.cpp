@@ -5,7 +5,7 @@
  */
 
 
-#include <MyNode.h>
+#include <OlafNode.h>
 #include <gtest/gtest.h>
 #include <ros/ros.h>
 
