@@ -19,6 +19,10 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     std::string default_character = "!";
     SB_getParam(nh, parameter_name, suffix, default_character);
 
+
+    // REMMEBER SB_GETPARAMS ARE RUNTIME CONSTANTS***************
+
+
     // Setup Subscriber(s)
     std::string topic_to_subscribe_to = "subscribe_topic";
     int refresh_rate = 10;
