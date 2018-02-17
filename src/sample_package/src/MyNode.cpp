@@ -23,7 +23,6 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     std::string topic_to_subscribe_to = "subscribe_topic";
     int refresh_rate = 10;
     my_subscriber = nh.subscribe(topic_to_subscribe_to, refresh_rate, &MyClass::subscriberCallBack, this);
-    
     // Setup Publisher(s)
     std::string topic = private_nh.resolveName("publish_topic");
     uint32_t queue_size = 1;
