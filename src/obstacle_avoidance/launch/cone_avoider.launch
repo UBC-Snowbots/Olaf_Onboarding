@@ -1,0 +1,4 @@
+<launch>
+    <node name="cone_avoider" pkg="obstacle_avoidance" type="cone_avoider" output="screen">
+    </node>
+</launch>
