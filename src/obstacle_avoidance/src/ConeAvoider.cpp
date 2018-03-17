@@ -6,9 +6,9 @@
  * Description: A node that subscribes to a lidar topic publishing twist messages for the robot to move.
  */
 
-#include <OlafNode.h>
+#include <ConeAvoider.h>
 
-OlafClass::OlafClass(int argc, char **argv, std::string node_name) {
+ConeAvoider::ConeAvoider(int argc, char **argv, std::string node_name) {
 
     // Setup NodeHandles
     ros::init(argc, argv, node_name);
@@ -18,14 +18,14 @@ OlafClass::OlafClass(int argc, char **argv, std::string node_name) {
     // Setup Subscriber(s)
     std::string topic_to_subscribe_to = "scan";
     int queue_size = 1;
-    my_subscriber = nh.subscribe(topic_to_subscribe_to, queue_size, &OlafClass::lidarSubscriberCallBack, this);
+    my_subscriber = nh.subscribe(topic_to_subscribe_to, queue_size, &ConeAvoider::lidarSubscriberCallBack, this);
 
     // Setup Publisher(s)
     std::string topic = private_nh.resolveName("/cmd_vel");
     my_publisher = private_nh.advertise<geometry_msgs::Twist>(topic, queue_size);
 }
 
-void OlafClass::lidarSubscriberCallBack(sensor_msgs::LaserScan scan_msg) {
+void ConeAvoider::lidarSubscriberCallBack(sensor_msgs::LaserScan scan_msg) {
 
     ROS_INFO("Received message from lidar");
     ros::Time time = scan_msg.header.stamp;
@@ -42,11 +42,11 @@ void OlafClass::lidarSubscriberCallBack(sensor_msgs::LaserScan scan_msg) {
     int cur_hole_start_index = 0;
 
     // Iterate through the vector
-    // Remove values out of range
+    // Remove values out of angle range given by lidar message (angle range of lidar)
     for(std::vector<float>::iterator it = ranges.begin(); it != ranges.end(); ++it) {
 
         //only process values within range
-        if (*it >= range_min || *it <= range_max) {
+        if (*it >= range_min && *it <= range_max) {
             cur_hole_size = 0;
             cur_hole_start_index = it - ranges.begin();
         } else {
@@ -76,18 +76,23 @@ void OlafClass::lidarSubscriberCallBack(sensor_msgs::LaserScan scan_msg) {
     // Get the middle angle of the biggest hole
     // Possible improvements: use distances to calculate the angle of the middle of the hole
     double mid_angle = (hole_start_angle + hole_end_angle)/2.0;
-
     if (mid_angle > M_PI) {
         mid_angle = mid_angle - 2.0*M_PI;
     }
 
-    // Move towards the hole!
     geometry_msgs::Twist twist;
     twist.linear.y = 0;
     twist.linear.z = 0;
     twist.angular.x = 0;
     twist.angular.y = 0;
-    twist.angular.z = 1.3*mid_angle;
-    twist.linear.x = 0.6;
+    if (max_hole_size == 0) {
+        // If there is no hole, move slowly straight
+        twist.angular.z = 0;
+        twist.linear.x = 0.1;
+    } else {
+        // Move towards the hole!
+        twist.angular.z = 1.3 * mid_angle;
+        twist.linear.x = 0.6;
+    }
     my_publisher.publish(twist);
 }

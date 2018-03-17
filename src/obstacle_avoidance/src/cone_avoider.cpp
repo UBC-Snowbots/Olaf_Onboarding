@@ -6,16 +6,16 @@
  * Description: A node that subscribes to a lidar topic publishing twist messages for the robot to move.
  */
 
-#include <OlafNode.h>
+#include <ConeAvoider.h>
 
 
 int main(int argc, char **argv){
 
     // Setup your ROS node
-    std::string node_name = "olaf_node";
+    std::string node_name = "cone_avoider";
 
     // Create an instance of your class
-    OlafClass olaf_node(argc, argv, node_name);
+    ConeAvoider cone_avoider(argc, argv, node_name);
 
     // Start up ros. This will continue to run until the node is killed
     ros::spin();

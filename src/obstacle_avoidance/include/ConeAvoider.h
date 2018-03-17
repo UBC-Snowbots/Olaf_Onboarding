@@ -6,8 +6,8 @@
  * Description: A node that subscribes to a lidar topic publishing twist messages for the robot to move.
  */
 
-#ifndef OBSTACLE_AVOIDANCE_OLAFNODE_H
-#define OBSTACLE_AVOIDANCE_OLAFNODE_H
+#ifndef OBSTACLE_AVOIDANCE_CONEAVOIDER_H
+#define OBSTACLE_AVOIDANCE_CONEAVOIDER_H
 
 #include <iostream>
 #include <std_msgs/String.h>
@@ -17,9 +17,9 @@
 #include <geometry_msgs/Twist.h>
 #include <math.h>
 
-class OlafClass {
+class ConeAvoider {
 public:
-    OlafClass(int argc, char **argv, std::string node_name);
+    ConeAvoider(int argc, char **argv, std::string node_name);
 
     /**
      * Callback function for when a new laser scan is received
@@ -33,4 +33,4 @@ private:
     ros::Subscriber my_subscriber;
     ros::Publisher my_publisher;
 };
-#endif //OBSTACLE_AVOIDANCE_OLAFNODE_H_H
+#endif //OBSTACLE_AVOIDANCE_CONEAVOIDER_H_H
