@@ -7,7 +7,8 @@
  */
 
 #include <GoThroughHole.h>
-#include <>
+#include <laser_geometry/laser_geometry.h>
+#include <cmath>
 
 MyClass::MyClass(int argc, char **argv, std::string node_name) {
     // Setup NodeHandles
@@ -30,7 +31,7 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
     // Setup Publisher(s)
     std::string topic = private_nh.resolveName("publish_topic");
     uint32_t queue_size = 1;
-    my_publisher = private_nh.advertise<geometry_msgs::Twist>(topic, queue_size);
+    my_publisher = private_nh.advertise<sensor_msgs::PointCloud>(topic, queue_size);
 }
 
 void MyClass::subscriberCallBack(const sensor_msgs::LaserScan::ConstPtr& msg) {
@@ -40,10 +41,23 @@ void MyClass::subscriberCallBack(const sensor_msgs::LaserScan::ConstPtr& msg) {
     std::string new_msg = addCharacterToString(input_string, suffix);
     republishMsg(new_msg);
     */
+    /*
     ROS_INFO("\nThe ranges are: ");
     for (int i = 0; i < msg->ranges.size(); i++) {
         ROS_INFO("%f", msg->ranges[i]);
     }
+    */
+    sensor_msgs::PointCloud cloud;
+    laser_geometry::LaserProjection projector_;
+    projector_.projectLaser(*msg, cloud); 
+    my_publisher.publish(cloud);
+    /*
+    ROS_INFO("The gaps and their intensities:");
+    std::vector<int> gaps = findGaps(*msg);
+    for (int i = 0; i < gaps.size(); i++) {
+        ROS_INFO("%i", gaps[i]);
+    }
+    */
 }
 /*
 std::string MyClass::addCharacterToString(std::string input_string, std::string suffix) {
@@ -56,13 +70,15 @@ void MyClass::republishMsg(std::string msg_to_publish) {
     ROS_INFO("Published message");
 }
 */
-void MyClass::findGaps(sensor_msgs::LaserScan scanData) {
-    int gaps[]; // I want to store all the gaps in the LaserScan data
+std::vector<int> MyClass::findGaps(sensor_msgs::LaserScan msg) {
+    std::vector<int> gaps;
     int element = 0;
     bool gapExists = true;
-    for (int i = 0; i < msg->ranges.size(); i++) {
-        if (msg->ranges[i] != msg->ranges[i]) {
+    gaps.push_back(0);
+    for (int i = 0; i < msg.ranges.size(); i++) {
+        if (std::isnan(msg.ranges[i])) {
             if (!gapExists) {
+                gaps.push_back(0);
                 element++;
             }
             gapExists = true;
@@ -71,4 +87,5 @@ void MyClass::findGaps(sensor_msgs::LaserScan scanData) {
             gapExists = false;
         }
     }
+    return gaps;
 }

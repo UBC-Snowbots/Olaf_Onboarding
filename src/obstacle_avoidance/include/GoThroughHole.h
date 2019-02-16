@@ -10,9 +10,12 @@
 #define SAMPLE_PACKAGE_MYNODE_H
 
 #include <iostream>
+#include <vector>
 #include <string.h>
 #include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Point32.h>
 #include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/PointCloud.h>
 #include <ros/ros.h>
 #include <sb_utils.h>
 
@@ -51,8 +54,11 @@ private:
 
      * @param scanData the LaserScan data
      */
-    void findGaps (sensor_msgs::LaserScan scanData);
+    std::vector<int> findGaps (sensor_msgs::LaserScan scanData);
 
+    geometry_msgs::Point32 findHole (sensor_msgs::PointCloud scanData); 
+    void moveThroughHole (geometry_msgs::Point32 centerOfHole);
+    void findHole (sensor_msgs::PointCloud msg);
     ros::Subscriber my_subscriber;
     ros::Publisher my_publisher;
 };

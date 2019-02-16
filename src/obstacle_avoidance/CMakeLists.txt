@@ -7,6 +7,7 @@ project(obstacle_avoidance)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  laser_geometry
 )
 find_package(sb_utils REQUIRED)
 
