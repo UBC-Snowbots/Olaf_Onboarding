@@ -1,6 +1,6 @@
 #include <GoThroughHole.h>
 
-geometry_msgs::Point32 MyClass::findHole (sensor_msgs::PointCloud scanData) {
+geometry_msgs::Point32 findHole (sensor_msgs::PointCloud scanData) {
     // finds the set of coordinates to go through
     /*
       determine the slope of the line through consecutive points
@@ -16,7 +16,7 @@ geometry_msgs::Point32 MyClass::findHole (sensor_msgs::PointCloud scanData) {
     */
 }
 
-void MyClass::moveThroughHole (geometry_msgs::Point32 centerOfHole ) {
+void moveThroughHole (geometry_msgs::Point32 centerOfHole ) {
     /* Use proportional control to lead robot to hole
        
        set the Twist message to be proportional to the distance to the

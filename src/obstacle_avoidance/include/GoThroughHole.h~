@@ -75,5 +75,6 @@ private:
 
     ros::Subscriber my_subscriber;
     ros::Publisher my_publisher;
+    ros::Rate loop_rate(10);
 };
 #endif //SAMPLE_PACKAGE_MYNODE_H

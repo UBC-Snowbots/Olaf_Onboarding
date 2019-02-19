@@ -1,5 +1,5 @@
 /*
- * Created By: Ihsan Olawale
+ * Created By: Gareth Ellis
  * Created On: February 16th, 2019
  * Description: Uses LaserScan data of a setup of cones to move Olaf the robot
  *              through the gap in the cones
@@ -13,7 +13,7 @@ int main(int argc, char **argv){
     std::string node_name = "go_through_hole";
 
     // Create an instance of your class
-    GoThroughHole go_through_hole(argc, argv, node_name);
+    MyClass my_class(argc, argv, node_name);
 
     // Start up ros. This will continue to run until the node is killed
     ros::spin();
