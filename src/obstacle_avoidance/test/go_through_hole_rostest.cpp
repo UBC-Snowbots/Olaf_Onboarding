@@ -1,11 +1,11 @@
 /*
- * Created By: Valerian Ratu
- * Created On: January 29, 2017
- * Description: Integration testing for MyNode
+ * Created By: Ihsan Olawale
+ * Created On: February 29, 2019
+ * Description: Integration testing for GoThroughHole
  */
 
 
-#include <MyNode.h>
+#include <GoThroughHole.h>
 #include <gtest/gtest.h>
 #include <ros/ros.h>
 
@@ -18,11 +18,11 @@
  *      callback function - the callback function which corresponds to the subscriber
  *      getter function - to provide a way for gtest to check for equality of the message recieved
  */
-class MyNodeTest : public testing::Test{
+class GoThroughHoleTest : public testing::Test{
 protected:
     virtual void SetUp(){
-        test_publisher = nh_.advertise<std_msgs::String>("subscribe_topic", 1);
-        test_subscriber = nh_.subscribe("/my_node/publish_topic", 1, &MyNodeTest::callback, this);
+        test_publisher = nh_.advertise<sensor_msgs::LaserScan>("scan", 1);
+        test_subscriber = nh_.subscribe("/go_through_hole/move_olaf", 1, &GoThroughHoleTest::callback, this);
 
         // Let the publishers and subscribers set itself up timely
         ros::Rate loop_rate(1);
@@ -30,24 +30,21 @@ protected:
     }
 
     ros::NodeHandle nh_;
-    std::string message_output;
+    geometry_msgs::Twist message_output;
     ros::Publisher test_publisher;
     ros::Subscriber test_subscriber;
 
 public:
 
-    void callback(const std_msgs::String::ConstPtr& msg){
-        message_output = msg->data.c_str();
+    void callback(const geometry_msgs::Twist::ConstPtr& msg){
+        message_output = *msg;
     }
 };
 
-TEST_F(MyNodeTest, exclamationMarkAppend){
+TEST_F(GoThroughHoleTest, exclamationMarkAppend){
 
-    // publishes "Hello" to the test node
-    std_msgs::String msg;
-    msg.data = "Hello";
-    test_publisher.publish(msg);
-    // rostopic echo subscribe_topic 
+    // publishes a LaserScan message to the test node
+
     // Wait for the message to get passed around
     ros::Rate loop_rate(1);
     loop_rate.sleep();
@@ -56,14 +53,8 @@ TEST_F(MyNodeTest, exclamationMarkAppend){
     // for the curious: http://answers.ros.org/question/11887/significance-of-rosspinonce/
     ros::spinOnce();
 
-    int count = 1;
-    while (message_output == "" && count <= 20) {
-	    test_publisher.publish(msg);
-	    loop_rate.sleep();
-	    ros::spinOnce();
-	    count++;
-    }
-    EXPECT_EQ("Hello!", message_output);
+    // Make sure the robot is receiving the right Twist command
+    // EXPECT_EQ("Hello!", message_output);
 }
 
 

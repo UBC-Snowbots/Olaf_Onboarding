@@ -5,8 +5,8 @@
  *              through the gap in the cones
  */
 
-#ifndef SAMPLE_PACKAGE_MYNODE_H
-#define SAMPLE_PACKAGE_MYNODE_H
+#ifndef GO_THROUGH_HOLE_H
+#define GO_THROUGH_HOLE_H
 
 #include <vector>
 #include <geometry_msgs/Twist.h>
@@ -19,16 +19,8 @@
 class GoThroughHole {
 public:
     GoThroughHole(int argc, char **argv, std::string node_name);
-    
 
-private:
-    /**
-     * Callback function for when a LaserScan message is received
-     *
-     * @param msg the LaserScan data received in the callback
-     */
-    void subscriberCallBack(const sensor_msgs::LaserScan::ConstPtr& msg);
-    
+
 
     /**
      * Function to determine gaps in the data
@@ -46,7 +38,7 @@ private:
      *
      * @return the center of the hole relative to Olaf's origin
      */
-    geometry_msgs::Point32 findHole (sensor_msgs::LaserScan scan_data); 
+    static geometry_msgs::Point32 findHole (sensor_msgs::PointCloud scan_data);
 
     /**
      * Function to convert LaserScan data to PointCloud with transformation
@@ -56,14 +48,14 @@ private:
      *
      * @return the PointCloud transformation of msg
      */
-    sensor_msgs::PointCloud laserToPointCloud (sensor_msgs::LaserScan msg);
+    static sensor_msgs::PointCloud laserToPointCloud (sensor_msgs::LaserScan msg);
 
     /**
      * Function to bring Olaf to a halt, with the hopes of keeping the
      * transformation from LaserScan to PointCloud accurate
      *
      */
-    void stopOlaf();
+    static geometry_msgs::Twist stopOlaf();
 
     /**
      * Function to angle Olaf towards the hole and inch forward
@@ -71,9 +63,19 @@ private:
      *
      * @param center the center of the hole
      */
-    void moveToHole (geometry_msgs::Point32 center);
+    static geometry_msgs::Twist moveToHole (geometry_msgs::Point32 center);
+
+private:
+    /**
+     * Callback function for when a LaserScan message is received
+     *
+     * @param msg the LaserScan data received in the callback
+     */
+    void subscriberCallBack(const sensor_msgs::LaserScan::ConstPtr& msg);
+
+
 
     ros::Subscriber my_subscriber;
     ros::Publisher my_publisher;
 };
-#endif //SAMPLE_PACKAGE_MYNODE_H
+#endif //GO_THROUGH_HOLE_H

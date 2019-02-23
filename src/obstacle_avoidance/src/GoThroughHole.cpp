@@ -9,7 +9,7 @@
 #include <laser_geometry/laser_geometry.h>
 #include <cmath>
 
-ros::Rate loop_rate(10);
+bool done = false;
 
 GoThroughHole::GoThroughHole(int argc, char **argv, std::string node_name) {
     // Setup NodeHandles
@@ -26,13 +26,18 @@ GoThroughHole::GoThroughHole(int argc, char **argv, std::string node_name) {
     std::string topic = private_nh.resolveName("move_olaf");
     uint32_t queue_size = 1;
     my_publisher = private_nh.advertise<geometry_msgs::Twist>(topic, queue_size);
-    
 }
 
 void GoThroughHole::subscriberCallBack(const sensor_msgs::LaserScan::ConstPtr& msg) {
-	stopOlaf();
+	ros::Rate loop_rate(10);
+	geometry_msgs::Twist command = stopOlaf();
+	my_publisher.publish(command);
 	loop_rate.sleep();
-	geometry_msgs::Point32 center = findHole(*msg);
+	sensor_msgs::PointCloud cloud = laserToPointCloud(*msg);
+	geometry_msgs::Point32 center = findHole(cloud);
+	if (done) {
+		return;
+	}
 	if (std::sqrt(std::pow(center.x,2)+std::pow(center.y,2)) < 0.001) {
 		geometry_msgs::Twist command;
 		command.linear.x = .20;
@@ -43,10 +48,10 @@ void GoThroughHole::subscriberCallBack(const sensor_msgs::LaserScan::ConstPtr& m
 		command.angular.z = 0;
 		my_publisher.publish(command);
 		loop_rate.sleep();
-		ros::shutdown();
 		return;
 	}
-	moveToHole(center);
+	command = moveToHole(center);
+	my_publisher.publish(command);
 }
 
 std::vector<int> GoThroughHole::findGaps(sensor_msgs::LaserScan msg) {
@@ -69,8 +74,7 @@ std::vector<int> GoThroughHole::findGaps(sensor_msgs::LaserScan msg) {
     return gaps;
 }
 
-geometry_msgs::Point32 GoThroughHole::findHole (sensor_msgs::LaserScan scan_data) {
-	sensor_msgs::PointCloud cloud = laserToPointCloud(scan_data);
+geometry_msgs::Point32 GoThroughHole::findHole (sensor_msgs::PointCloud cloud) {
 	std::vector<geometry_msgs::Point32> boundaryPoints;
 	boundaryPoints.push_back(cloud.points[0]);
 	boundaryPoints.push_back(cloud.points[1]);
@@ -111,7 +115,7 @@ sensor_msgs::PointCloud GoThroughHole::laserToPointCloud (sensor_msgs::LaserScan
 	return cloud;
 }
 
-void GoThroughHole::stopOlaf (void) {
+geometry_msgs::Twist GoThroughHole::stopOlaf (void) {
 	geometry_msgs::Twist command;
 	command.linear.x = 0;
 	command.linear.y = 0;
@@ -119,10 +123,10 @@ void GoThroughHole::stopOlaf (void) {
 	command.angular.z = 0;
 	command.angular.y = 0;
 	command.angular.x = 0;
-	my_publisher.publish(command);
+	return command;
 }
 
-void GoThroughHole::moveToHole (geometry_msgs::Point32 center) {
+geometry_msgs::Twist GoThroughHole::moveToHole (geometry_msgs::Point32 center) {
 	// move along line connecting robot to center
 	geometry_msgs::Twist command;
 	command.linear.y = 0;
@@ -133,7 +137,5 @@ void GoThroughHole::moveToHole (geometry_msgs::Point32 center) {
 	command.linear.x = std::sqrt(std::pow(center.x,2)+std::pow(center.y,2));
 	command.angular.z = std::atan2(center.y, center.x);
 
-	my_publisher.publish(command);
-	loop_rate.sleep();
-	stopOlaf();
+	return command;
 }
