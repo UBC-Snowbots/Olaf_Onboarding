@@ -9,7 +9,6 @@
 #include <laser_geometry/laser_geometry.h>
 #include <cmath>
 
-bool done = false;
 
 GoThroughHole::GoThroughHole(int argc, char **argv, std::string node_name) {
     // Setup NodeHandles
@@ -29,27 +28,8 @@ GoThroughHole::GoThroughHole(int argc, char **argv, std::string node_name) {
 }
 
 void GoThroughHole::subscriberCallBack(const sensor_msgs::LaserScan::ConstPtr& msg) {
-	ros::Rate loop_rate(10);
-	geometry_msgs::Twist command = stopOlaf();
-	my_publisher.publish(command);
-	loop_rate.sleep();
 	sensor_msgs::PointCloud cloud = laserToPointCloud(*msg);
 	geometry_msgs::Point32 center = findHole(cloud);
-	if (done) {
-		return;
-	}
-	if (std::sqrt(std::pow(center.x,2)+std::pow(center.y,2)) < 0.001) {
-		geometry_msgs::Twist command;
-		command.linear.x = .20;
-		command.linear.y = 0;
-		command.linear.z = 0;
-		command.angular.y = 0;
-		command.angular.x = 0;
-		command.angular.z = 0;
-		my_publisher.publish(command);
-		loop_rate.sleep();
-		return;
-	}
 	command = moveToHole(center);
 	my_publisher.publish(command);
 }
@@ -137,5 +117,8 @@ geometry_msgs::Twist GoThroughHole::moveToHole (geometry_msgs::Point32 center) {
 	command.linear.x = std::sqrt(std::pow(center.x,2)+std::pow(center.y,2));
 	command.angular.z = std::atan2(center.y, center.x);
 
-	return command;
+        if (std::sqrt(std::pow(center.x,2)+std::pow(center.y,2)) < 0.001) {
+		command = stopOlaf(); 
+	}
+        return command;
 }
