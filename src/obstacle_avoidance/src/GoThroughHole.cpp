@@ -30,7 +30,7 @@ GoThroughHole::GoThroughHole(int argc, char **argv, std::string node_name) {
 void GoThroughHole::subscriberCallBack(const sensor_msgs::LaserScan::ConstPtr& msg) {
 	sensor_msgs::PointCloud cloud = laserToPointCloud(*msg);
 	geometry_msgs::Point32 center = findHole(cloud);
-	command = moveToHole(center);
+	geometry_msgs::Twist command = moveToHole(center);
 	my_publisher.publish(command);
 }
 
@@ -54,38 +54,51 @@ std::vector<int> GoThroughHole::findGaps(sensor_msgs::LaserScan msg) {
     return gaps;
 }
 
+double distance (geometry_msgs::Point32 point1, geometry_msgs::Point32 point2) {
+    return std::sqrt(std::pow(point1.x-point2.x,2)+std::pow(point1.y-point2.y,2)+std::pow(point1.z-point2.z,2));
+}
+
 geometry_msgs::Point32 GoThroughHole::findHole (sensor_msgs::PointCloud cloud) {
-	std::vector<geometry_msgs::Point32> boundaryPoints;
-	boundaryPoints.push_back(cloud.points[0]);
-	boundaryPoints.push_back(cloud.points[1]);
-	boundaryPoints.push_back(cloud.points[cloud.points.size()-2]);
-	boundaryPoints.push_back(cloud.points[cloud.points.size()-1]);
-	std::vector<double> slopes(2);
-	slopes[0] = (boundaryPoints[1].y-boundaryPoints[0].y)/(boundaryPoints[1].x-boundaryPoints[0].x);
-	slopes[1] = (boundaryPoints[3].y-boundaryPoints[2].y)/(boundaryPoints[3].x-boundaryPoints[2].x);
-	// iterate over points
-	double slope;
-	for (int i = 1; i < cloud.points.size(); i++) {
-		// calculate the two max slope differences
-		slope = (cloud.points[i].y-cloud.points[i-1].y)/(cloud.points[i].x-cloud.points[i-1].x);
-		if (slope > slopes[0]) {
-			slopes[0] = slope;
-			boundaryPoints[1] = cloud.points[i];
-			boundaryPoints[0] = cloud.points[i-1];
-		}else {
-			if (slope > slopes[1]) {
-				slopes[1] = slope;
-				boundaryPoints[3] = cloud.points[i];
-				boundaryPoints[2] = cloud.points[i-1];
-			}
-		}
-	}
-	geometry_msgs::Point32 center;
-	center.x = (boundaryPoints[1].x+boundaryPoints[2].x)/2;
-	center.y = (boundaryPoints[1].y+boundaryPoints[2].y)/2;
-	center.z = (boundaryPoints[1].z+boundaryPoints[2].z)/2;
-	return center;
-	// average the two and find the center
+    // Use K-means algorithm with K=2 to filter data points into two walls
+    // Because geometry_msgs::Point32 does not come with methods to compare, each wall is split into its x and y components
+    std::vector<double> wall1x, wall1y, wall2x, wall2y, pre_wall1x, pre_wall1y;
+    // left most point of cloud
+    geometry_msgs::Point32 centroid1 = cloud.points.back();
+    // right most point of cloud
+    geometry_msgs::Point32 centroid2 = cloud.points[0];
+    pre_wall1x = {0}, pre_wall1y = {0};
+    while (pre_wall1x != wall1x || pre_wall1y != wall1y) {
+        pre_wall1x = std::move(wall1x);
+        pre_wall1y = std::move(wall1y);
+        // assign each point to a wall
+        for (int i = 0; i < cloud.points.size(); i++) {
+            if (distance(cloud.points[i],centroid1) < distance(cloud.points[i],centroid2)) {
+                wall1x.push_back(cloud.points[i].x);
+                wall1y.push_back(cloud.points[i].y);
+            }else {
+                wall2x.push_back(cloud.points[i].x);
+                wall2y.push_back(cloud.points[i].y);
+            }
+        }
+        // recompute the centroids
+        centroid1.x = 0, centroid1.y = 0, centroid1.z = 0;
+        centroid2 = centroid1;
+        for (int j = 0; j < wall1x.size(); j++) {
+            centroid1.x += wall1x[j] / wall1x.size(); 
+            centroid1.y += wall1y[j] / wall1x.size();
+        }
+        for (int j = 0; j < wall2x.size(); j++) {
+            centroid2.x += wall2x[j] / wall2x.size();
+            centroid2.y += wall2y[j] / wall2x.size();
+        }
+    }
+    geometry_msgs::Point32 center;
+    // find right most point of wall1, left most point of wall2
+    // average them
+    center.x = (wall1x[0] + wall2x.back())/2;
+    center.y = (wall1y[0] + wall2y.back())/2;
+    center.z = 0;
+    return center;
 }
 
 sensor_msgs::PointCloud GoThroughHole::laserToPointCloud (sensor_msgs::LaserScan msg) {
