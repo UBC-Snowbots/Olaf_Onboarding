@@ -58,18 +58,15 @@ double distance (geometry_msgs::Point32 point1, geometry_msgs::Point32 point2) {
     return std::sqrt(std::pow(point1.x-point2.x,2)+std::pow(point1.y-point2.y,2)+std::pow(point1.z-point2.z,2));
 }
 
-geometry_msgs::Point32 GoThroughHole::findHole (sensor_msgs::PointCloud cloud) {
-    // Use K-means algorithm with K=2 to filter data points into two walls
-    // Because geometry_msgs::Point32 does not come with methods to compare, each wall is split into its x and y components
-    std::vector<double> wall1x, wall1y, wall2x, wall2y, pre_wall1x, pre_wall1y;
-    // left most point of cloud
-    geometry_msgs::Point32 centroid1 = cloud.points.back();
-    // right most point of cloud
-    geometry_msgs::Point32 centroid2 = cloud.points[0];
-    pre_wall1x = {0}, pre_wall1y = {0};
+void GoThroughHole::assignToWalls (sensor_msgs::PointCloud cloud, std::vector<double>& wall1x, std::vector<double>& wall1y, std::vector<double>& wall2x, std::vector<double>& wall2y) {
+    geometry_msgs::Point32 centroid2 = cloud.points.back();
+    geometry_msgs::Point32 centroid1 = cloud.points[0];
+    std::vector<double> pre_wall1x = {0}, pre_wall1y = {0};
     while (pre_wall1x != wall1x || pre_wall1y != wall1y) {
         pre_wall1x = std::move(wall1x);
         pre_wall1y = std::move(wall1y);
+        wall2x.clear();
+        wall2y.clear();
         // assign each point to a wall
         for (int i = 0; i < cloud.points.size(); i++) {
             if (distance(cloud.points[i],centroid1) < distance(cloud.points[i],centroid2)) {
@@ -84,7 +81,7 @@ geometry_msgs::Point32 GoThroughHole::findHole (sensor_msgs::PointCloud cloud) {
         centroid1.x = 0, centroid1.y = 0, centroid1.z = 0;
         centroid2 = centroid1;
         for (int j = 0; j < wall1x.size(); j++) {
-            centroid1.x += wall1x[j] / wall1x.size(); 
+            centroid1.x += wall1x[j] / wall1x.size();
             centroid1.y += wall1y[j] / wall1x.size();
         }
         for (int j = 0; j < wall2x.size(); j++) {
@@ -92,8 +89,51 @@ geometry_msgs::Point32 GoThroughHole::findHole (sensor_msgs::PointCloud cloud) {
             centroid2.y += wall2y[j] / wall2x.size();
         }
     }
+}
+geometry_msgs::Point32 GoThroughHole::findBoundaryPoint (std::vector<double> wallx, std::vector<double> wally, bool left) {
+    geometry_msgs::Point32 point;
+    if (!left) {
+        point.x = wallx[0], point.y = wally[0], point.z = 0;
+    } else {
+        point.x = wallx.back(), point.y = wally.back(), point.z = 0;
+    }
+    return point;
+}
+geometry_msgs::Point32 GoThroughHole::findHole (sensor_msgs::PointCloud cloud) {
+    // Use K-means algorithm with K=2 to filter data points into two walls
+    // Because geometry_msgs::Point32 does not come with methods to compare, each wall is split into its x and y components
+    std::vector<double> wall1x, wall1y, wall2x, wall2y, pre_wall1x, pre_wall1y;
+    // left most point of cloud
+    // right most point of cloud
+    GoThroughHole::assignToWalls(cloud, wall1x, wall1y, wall2x, wall2y);
+
+    std::vector<geometry_msgs::Point32> wall1, wall2;
+    for (int i = 0; i < wall1x.size(); i++) {
+        geometry_msgs::Point32 point;
+        wall1.push_back(point);
+        wall1[i].x = wall1x[i];
+        wall1[i].y = wall1y[i];
+    }
+    // some other points in wall are noise
+    for (auto i = wall1x.begin(); i != wall1x.end(); ) {
+        if (/* current point too far away from centroid1 */) {
+            wall1x.erase(i);
+            i = wall1y.erase(i);
+        } else {
+            i++;
+        }
+    }for (auto i = wall2x.begin(); i != wall2x.end(); ) {
+        if (/* current point too far away from centroid2 */) {
+            wall2x.erase(i);
+            i = wall2y.erase(i);
+        } else {
+            i++;
+        }
+    }
+
+
     geometry_msgs::Point32 center;
-    // find right most point of wall1, left most point of wall2
+    // find right most point of wall2, left most point of wall1
     // average them
     center.x = (wall1x[0] + wall2x.back())/2;
     center.y = (wall1y[0] + wall2y.back())/2;

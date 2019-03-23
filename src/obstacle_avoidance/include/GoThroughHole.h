@@ -31,6 +31,21 @@ public:
     std::vector<int> findGaps (sensor_msgs::LaserScan scan_data);
 
     /**
+     * Function to implement K-means clustering algorithm on scanned data of cones with K=2 clusters
+     *
+     *
+     * @param cloud the LaserScan data in the form of a PointCloud
+     * @param wall1x the x-coordinates of the first wall
+     * @param wall1y the y-coordinates of the first wall
+     * @param wall2x the x-coordinates of the second wall
+     * @param wall2y the y-coordinates of the second wall
+     */
+
+    static void assignToWalls (sensor_msgs::PointCloud cloud, std::vector<double>& wall1x, std::vector<double>& wall1y, std::vector<double>& wall2x, std::vector<double>& wall2y);
+
+    static geometry_msgs::Point32 findBoundaryPoint (std::vector<double> wallx, std::vector<double> wally, bool left);
+
+    /**
      * Function to find the hole in the cones
      *
      *
@@ -39,6 +54,8 @@ public:
      * @return the center of the hole relative to Olaf's origin
      */
     static geometry_msgs::Point32 findHole (sensor_msgs::PointCloud scan_data);
+
+
 
     /**
      * Function to convert LaserScan data to PointCloud with transformation

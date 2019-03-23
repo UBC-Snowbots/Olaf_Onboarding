@@ -195,6 +195,48 @@ sensor_msgs::PointCloud createData (void) {
 
     return cloud;
 }
+TEST(assignToWall, accuracy){
+    sensor_msgs::PointCloud cloud = createData();
+    std::vector<double> wall1x, wall1y, wall2y, wall2x;
+    GoThroughHole::assignToWalls(cloud, wall1x, wall1y, wall2x, wall2y);
+
+    std::vector<double> expected_wall1x, expected_wall1y, expected_wall2x, expected_wall2y;
+    for (int i = 0; i < 16; i++) {
+        if (i < 8) {
+            expected_wall1x.push_back(cloud.points[i].x);
+            expected_wall1y.push_back(cloud.points[i].y);
+        } else {
+            expected_wall2x.push_back(cloud.points[i].x);
+            expected_wall2y.push_back(cloud.points[i].y);
+        }
+    }
+    EXPECT_EQ(expected_wall1x, wall1x);
+    EXPECT_EQ(expected_wall1y, wall1y);
+    EXPECT_EQ(expected_wall2x, wall2x);
+    EXPECT_EQ(expected_wall2y, wall2y);
+}
+TEST(findBoundaryPoint, right){
+    sensor_msgs::PointCloud cloud = createData();
+    std::vector<double> wallx, wally;
+    for (int i = 0; i < 8; i++) {
+        wallx.push_back(cloud.points[i].x);
+        wally.push_back(cloud.points[i].y);
+    }
+    geometry_msgs::Point32 point = GoThroughHole::findBoundaryPoint(wallx, wally, false);
+    EXPECT_EQ(wallx[0], point.x);
+    EXPECT_EQ(wally[0], point.y);
+}
+TEST(findBoundaryPoint, left){
+    sensor_msgs::PointCloud cloud = createData();
+    std::vector<double> wallx, wally;
+    for (int i = 0; i < 8; i++) {
+        wallx.push_back(cloud.points[i].x);
+        wally.push_back(cloud.points[i].y);
+    }
+    geometry_msgs::Point32 point = GoThroughHole::findBoundaryPoint(wallx, wally, true);
+    EXPECT_EQ(wallx.back(), point.x);
+    EXPECT_EQ(wally.back(), point.y);
+}
 // Testing findHole
 TEST(findHole, straight_ahead){
     // create the PointCloud with noise
@@ -230,32 +272,38 @@ TEST(findHole, really_close){
 TEST(findHole, angled_right){
     // create the PointCloud with noise
     sensor_msgs::PointCloud cloud = createData();
+    double angle = 45 * M_PI / 180;
     for (int i = 0; i < cloud.points.size(); i++) {
-        cloud.points[i].x = std::sqrt(1.0/2)*(cloud.points[i].x + cloud.points[i].y);
-        cloud.points[i].y = std::sqrt(1.0/2)*(-cloud.points[i].x + cloud.points[i].y);
+        double xnew = cloud.points[i].x*std::cos(-angle) - cloud.points[i].y*std::sin(-angle);
+        double ynew = cloud.points[i].x*std::sin(-angle) + cloud.points[i].y*std::cos(-angle);
+        cloud.points[i].x = xnew;
+        cloud.points[i].y = ynew;
     }
     // pass it in
     geometry_msgs::Point32 center = GoThroughHole::findHole(cloud);
 
     geometry_msgs::Point32 expected;
-    expected.x = std::sqrt(1.0/2)*(3+0);
-    expected.y = std::sqrt(1.0/2)*(-3+0);
+    expected.x = 3*std::cos(-angle);
+    expected.y = 3*std::sin(-angle);
     double abs_error = 0.001;
     EXPECT_NEAR(center.x, expected.x, abs_error);
     EXPECT_NEAR(center.y, expected.y, abs_error);
 }
 TEST(findHole, angled_left){
     sensor_msgs::PointCloud cloud = createData();
+    double angle = 45 * M_PI / 180;
     for (int i = 0; i < cloud.points.size(); i++) {
-        cloud.points[i].x = std::sqrt(1.0/2)*(cloud.points[i].x - cloud.points[i].y);
-        cloud.points[i].y = std::sqrt(1.0/2)*(cloud.points[i].x + cloud.points[i].y);
+        double xnew = cloud.points[i].x*std::cos(angle) - cloud.points[i].y*std::sin(angle);
+        double ynew = cloud.points[i].x*std::sin(angle) + cloud.points[i].y*std::cos(angle);
+        cloud.points[i].x = xnew;
+        cloud.points[i].y = ynew;
     }
 
     geometry_msgs::Point32 center = GoThroughHole::findHole(cloud);
 
     geometry_msgs::Point32 expected;
-    expected.x = std::sqrt(1.0/2)*(3  - 0);
-    expected.y = std::sqrt(1.0/2)*(3 + 0);
+    expected.x = 3*std::cos(angle);
+    expected.y = 3*std::sin(angle);
 
     double abs_error = 0.001;
     EXPECT_NEAR(center.y, expected.y, abs_error);
