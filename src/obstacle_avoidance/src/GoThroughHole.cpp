@@ -128,7 +128,7 @@ geometry_msgs::Point32 GoThroughHole::findHole (sensor_msgs::PointCloud cloud) {
         centroid2.x += wall2[i].x/wall2x.size();
         centroid2.y += wall2[i].y/wall2x.size();
     }
-    double cutoff = 1;
+    double cutoff = 1; // maximum allowable distance from centroid
     for (auto i = wall1.begin(); i != wall1.end(); ) {
         if (distance(*i, centroid1) > cutoff) {
             i = wall1.erase(i);
