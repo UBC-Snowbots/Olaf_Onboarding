@@ -1,6 +1,6 @@
 # Nav Onboarding
 
-Welcome to Snowbots! This repo is where you'll be working on a navigation onboarding challenge, making our robot Olaf avoid obstacles in the real world! The goal of this is to become comfortable working with C++ and ROS, and also be used to our development processes! This challenge will look a little intimidating at first, as we've been intentionally vague in several places, but this is so we can get you to **use the power of google** or to **ask us (that's  what we're here for!)** for problem solving.
+Welcome to Snowbots! This repo is where you'll be working on a navigation onboarding challenge - to make our robot Olaf avoid obstacles in the real world! The goal of this is to become comfortable working with C++ and ROS, and also be used to our development processes! This challenge will look a little intimidating at first, as we've been intentionally vague in several places, but this is so we can get you to **use the power of google** or to **ask us (that's  what we're here for!)** for problem solving.
 
 ### The Robot
 Our robot for IARRC, Olaf is a modified RC car that you'll interface with via USB
