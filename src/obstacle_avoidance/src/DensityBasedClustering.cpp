@@ -11,7 +11,6 @@
 #include<sensor_msgs/PointCloud.h>
 #include<geometry_msgs/Point32.h>
 #include<vector>
-#include<cmath>
 
 const float EPSILON = 0.3;
 const int MIN_NEIGHBOURS = 10;

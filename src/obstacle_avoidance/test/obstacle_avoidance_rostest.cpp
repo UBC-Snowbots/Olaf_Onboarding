@@ -12,9 +12,6 @@
 #include <sensor_msgs/LaserScan.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
-#include <iostream>
-#include<ros/console.h>
-#include<log4cxx/logger.h>
 
 /**
  * This is the helper class which will publish and subscribe messages which will test the node being instantiated

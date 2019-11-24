@@ -1,15 +1,12 @@
 /*
- * Created By: Gareth Ellis
- * Created On: July 16th, 2016
- * Description: An example node that subscribes to a topic publishing strings,
- *              and re-publishes everything it receives to another topic with
- *              a "!" at the end
+ * Created By: John Shin
+ * Created On: October 29, 2019
+ * Description: a node that guides Olaf to go though a hole
  */
 
 #ifndef SAMPLE_PACKAGE_MYNODE_H
 #define SAMPLE_PACKAGE_MYNODE_H
 
-#include <iostream>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 #include <ros/ros.h>

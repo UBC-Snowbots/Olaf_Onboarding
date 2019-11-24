@@ -2,8 +2,6 @@
 #include<gtest/gtest.h>
 #include<geometry_msgs/Point32.h>
 
-#include<iostream>
-
 class Clusters : public ::testing::Test{
 	protected:
 		virtual void SetUp(){

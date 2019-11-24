@@ -12,7 +12,6 @@
 #include<geometry_msgs/Point32.h>
 #include<DensityBasedClustering.h>
 #include<laser_geometry/laser_geometry.h>
-#include<cfloat>
 
 ObstacleAvoidance::ObstacleAvoidance(int argc, char **argv, std::string node_name) {
     // Setup NodeHandles
