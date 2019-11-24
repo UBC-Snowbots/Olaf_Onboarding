@@ -1,0 +1,6 @@
+<!-- A .test file which launches the node and its corresponding rostest -->
+
+<launch>
+    <node name="obstacle_avoidance" pkg="obstacle_avoidance" type="obstacle_avoidance" output="screen"/>
+    <test test-name="obstacle_avoidance_rostest" pkg="obstacle_avoidance" type="obstacle_avoidance_rostest"/>
+</launch>

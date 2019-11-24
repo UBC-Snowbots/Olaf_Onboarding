@@ -31,7 +31,7 @@ MyClass::MyClass(int argc, char **argv, std::string node_name) {
 }
 
 void MyClass::subscriberCallBack(const std_msgs::String::ConstPtr& msg) {
-    ROS_INFO("Received message");
+    ROS_INFO("Receive");
     std::string input_string = msg->data.c_str();
     std::string new_msg = addCharacterToString(input_string, suffix);
     republishMsg(new_msg);
